@@ -224,6 +224,7 @@ textarea {
 :root[data-theme="dark"] .compare-card,
 :root[data-theme="dark"] .insight-card {
   background: rgba(24, 32, 43, 0.82);
+  color: var(--ink);
 }
 
 .tool-card.featured {
@@ -255,6 +256,16 @@ textarea {
   font-family: var(--font-serif), serif;
   font-size: 1.8rem;
   letter-spacing: -0.03em;
+}
+
+:root[data-theme="dark"] .tool-card h2,
+:root[data-theme="dark"] .steps-grid h3,
+:root[data-theme="dark"] .sidebar-card h3,
+:root[data-theme="dark"] .sidebar-item strong,
+:root[data-theme="dark"] .metric-card strong,
+:root[data-theme="dark"] .compare-card strong,
+:root[data-theme="dark"] .insight-card h3 {
+  color: var(--ink);
 }
 
 .tool-card p {
@@ -507,6 +518,10 @@ textarea {
   color: var(--accent-green);
 }
 
+:root[data-theme="dark"] .metric-card-green strong {
+  color: #8fe0ad;
+}
+
 .progress-row {
   display: flex;
   justify-content: space-between;
@@ -571,6 +586,10 @@ textarea {
   stroke-width: 1;
 }
 
+:root[data-theme="dark"] .chart-grid-line {
+  stroke: rgba(255, 255, 255, 0.12);
+}
+
 .chart-axis-text {
   fill: var(--muted);
   font-family: var(--font-mono), monospace;
@@ -610,6 +629,14 @@ textarea {
   color: var(--muted);
   line-height: 1.6;
   font-size: 0.88rem;
+}
+
+:root[data-theme="dark"] .tool-card p,
+:root[data-theme="dark"] .steps-grid p,
+:root[data-theme="dark"] .compare-card p,
+:root[data-theme="dark"] .insight-card p,
+:root[data-theme="dark"] .sidebar-item span {
+  color: var(--muted);
 }
 
 .prompt-box {
