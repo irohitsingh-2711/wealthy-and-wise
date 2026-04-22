@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { calculators } from "@/lib/calculators";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function SiteHeader() {
   return (
@@ -15,6 +18,7 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
+        <ThemeToggle />
       </div>
     </header>
   );
