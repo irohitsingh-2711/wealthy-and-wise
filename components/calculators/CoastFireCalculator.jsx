@@ -201,7 +201,12 @@ function Field({ label, value, onChange, prefix, suffix, step = "1" }) {
       <span>{label}</span>
       <div className="input-wrap">
         {prefix ? <span className="input-addon">{prefix}</span> : null}
-        <input type="number" value={value} step={step} onChange={(event) => onChange(Number(event.target.value))} />
+        <input
+          type="number"
+          value={value === "" ? "" : value}
+          step={step}
+          onChange={(event) => onChange(event.target.value === "" ? "" : Number(event.target.value))}
+        />
         {suffix ? <span className="input-addon">{suffix}</span> : null}
       </div>
     </label>

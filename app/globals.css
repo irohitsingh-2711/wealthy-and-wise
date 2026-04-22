@@ -152,8 +152,12 @@ textarea {
   background: rgba(255, 255, 255, 0.04);
 }
 
-.theme-toggle-icon {
-  min-width: 3.2ch;
+.theme-toggle strong {
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.68rem;
 }
 
 .page-shell {
