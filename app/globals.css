@@ -1,0 +1,618 @@
+:root {
+  --ink: #101010;
+  --paper: #f5f1ea;
+  --card: #fbf8f3;
+  --cream: #ebe4d9;
+  --border: #d1c8bb;
+  --muted: #706a64;
+  --accent: #c84b2f;
+  --accent-blue: #2f6fc8;
+  --accent-gold: #c8962f;
+  --accent-green: #2a7a4f;
+  --accent-fire: #e05a1a;
+  --accent-coast: #1a5c8a;
+  --shadow: 0 18px 60px rgba(16, 16, 16, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top right, rgba(200, 75, 47, 0.08), transparent 22rem),
+    linear-gradient(180deg, #f7f2e9 0%, #f4efe7 100%);
+  color: var(--ink);
+  font-family: var(--font-sans), sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(18px);
+  background: rgba(245, 241, 234, 0.88);
+  border-bottom: 1px solid rgba(16, 16, 16, 0.08);
+}
+
+.site-header-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 1.1rem 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  font-family: var(--font-serif), serif;
+  font-size: 1.55rem;
+  letter-spacing: -0.03em;
+}
+
+.brand em,
+.hero h1 em,
+.calculator-hero h1 em {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.tool-nav {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.tool-nav a,
+.tool-tags span,
+.prompt-link,
+.section-label,
+.sidebar-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.tool-nav a {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.44);
+}
+
+.page-shell {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.hero,
+.calculator-hero {
+  padding: 2rem 0 1.8rem;
+  border-bottom: 1px solid var(--ink);
+}
+
+.hero h1,
+.calculator-hero h1 {
+  margin: 0;
+  max-width: 12ch;
+  font-family: var(--font-serif), serif;
+  font-size: clamp(2.9rem, 7vw, 5.5rem);
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+}
+
+.hero-copy,
+.calculator-hero p {
+  max-width: 42rem;
+  margin-top: 1.25rem;
+  color: var(--muted);
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+.home-section {
+  padding: 2.5rem 0 0;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 18rem;
+  padding: 1.6rem;
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: var(--shadow);
+}
+
+.tool-card.featured {
+  grid-column: span 2;
+  background: linear-gradient(160deg, #181512 0%, #251c17 100%);
+  color: #fdf6ed;
+}
+
+.tool-card.featured p {
+  color: rgba(253, 246, 237, 0.72);
+}
+
+.tool-card-number {
+  color: var(--border);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+}
+
+.tool-card-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+  margin-top: 2rem;
+}
+
+.tool-card h2 {
+  margin: 0;
+  font-family: var(--font-serif), serif;
+  font-size: 1.8rem;
+  letter-spacing: -0.03em;
+}
+
+.tool-card p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.tool-card-arrow {
+  color: inherit;
+  opacity: 0.6;
+  font-size: 1.1rem;
+}
+
+.tool-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.tool-tags span,
+.prompt-link {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.45rem 0.7rem;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.steps-grid article,
+.sidebar-card,
+.form-card,
+.chart-card,
+.progress-card,
+.metric-card,
+.post-prompt,
+.compare-card,
+.insight-card {
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow);
+}
+
+.steps-grid article {
+  padding: 1.4rem;
+}
+
+.steps-grid strong {
+  font-family: var(--font-serif), serif;
+  font-size: 2rem;
+  color: var(--border);
+}
+
+.steps-grid h3 {
+  margin: 0.8rem 0 0.4rem;
+  font-size: 1rem;
+}
+
+.steps-grid p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.calculator-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.25rem;
+  align-items: start;
+  padding-top: 2rem;
+}
+
+.calculator-panel,
+.results-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-card,
+.sidebar-card,
+.chart-card,
+.progress-card,
+.post-prompt,
+.insight-card {
+  padding: 1.25rem;
+}
+
+.field-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.field-grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-grid.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.field span,
+.metric-card span,
+.compare-card span,
+.toggle-header span,
+.progress-row span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.field > span,
+.metric-card > span,
+.compare-card > span {
+  font-family: var(--font-mono), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+}
+
+.input-wrap,
+.select-field {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  overflow: hidden;
+  background: var(--card);
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.input-addon {
+  padding: 0.9rem 0.85rem;
+  background: var(--cream);
+  color: var(--muted);
+  border-right: 1px solid var(--border);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8rem;
+}
+
+.input-wrap input {
+  width: 100%;
+  border: 0;
+  padding: 0.9rem 0.95rem;
+  background: transparent;
+}
+
+.select-field {
+  padding: 0.9rem 0.95rem;
+}
+
+.toggle-block {
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: rgba(235, 228, 217, 0.52);
+}
+
+.toggle-header {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  padding: 1rem;
+}
+
+.toggle-header input {
+  margin-top: 0.15rem;
+}
+
+.toggle-header strong,
+.metric-card strong,
+.compare-card strong,
+.insight-card h3 {
+  display: block;
+  font-family: var(--font-serif), serif;
+  letter-spacing: -0.03em;
+}
+
+.toggle-header strong {
+  font-size: 1rem;
+}
+
+.toggle-content {
+  padding: 0 1rem 1rem;
+}
+
+.cta-btn {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.metric-card {
+  padding: 1rem;
+}
+
+.metric-card strong {
+  margin-top: 0.45rem;
+  font-size: 1.75rem;
+}
+
+.metric-card-highlight {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.metric-card-highlight span {
+  color: rgba(255, 255, 255, 0.64);
+}
+
+.metric-card-green strong {
+  color: var(--accent-green);
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-track {
+  margin-top: 0.9rem;
+  height: 0.85rem;
+  border-radius: 999px;
+  background: var(--cream);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.progress-fill.fire {
+  background: var(--accent-fire);
+}
+
+.progress-fill.coast {
+  background: var(--accent-coast);
+}
+
+.chart-card {
+  overflow: hidden;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+}
+
+.legend-swatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 0.2rem;
+}
+
+.chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.chart-grid-line {
+  stroke: rgba(16, 16, 16, 0.08);
+  stroke-width: 1;
+}
+
+.chart-axis-text {
+  fill: var(--muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+}
+
+.sidebar-card h3 {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-serif), serif;
+  font-size: 1.5rem;
+}
+
+.sidebar-list {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.sidebar-item {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.sidebar-item strong {
+  font-size: 0.98rem;
+}
+
+.sidebar-item span {
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 0.88rem;
+}
+
+.prompt-box {
+  width: 100%;
+  min-height: 110px;
+  resize: none;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: #fffdf9;
+  padding: 1rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.prompt-links {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.compare-card {
+  padding: 1rem;
+}
+
+.compare-card strong {
+  margin-top: 0.5rem;
+  font-size: 1.8rem;
+}
+
+.compare-card p,
+.insight-card p {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.insight-card.buy {
+  border-color: rgba(200, 75, 47, 0.3);
+}
+
+.insight-card.rent {
+  border-color: rgba(47, 111, 200, 0.3);
+}
+
+.insight-card.dark {
+  background: linear-gradient(160deg, #181512 0%, #251c17 100%);
+  color: #f7f1ea;
+}
+
+.insight-card.dark p,
+.insight-card.dark .section-label {
+  color: rgba(247, 241, 234, 0.72);
+}
+
+@media (max-width: 1100px) {
+  .calculator-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .calculator-side {
+    order: -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .tools-grid,
+  .steps-grid,
+  .field-grid.two,
+  .field-grid.three,
+  .metric-grid,
+  .compare-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-card.featured {
+    grid-column: span 1;
+  }
+
+  .site-header-inner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .tool-nav {
+    justify-content: flex-start;
+  }
+}

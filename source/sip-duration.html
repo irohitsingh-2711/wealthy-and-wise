@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SIP Duration Estimator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --ink: #0e0e0e; --paper: #f5f1ea; --cream: #ede8de; --accent: #c84b2f; --accent2: #2f6fc8; --gold: #c8962f; --muted: #7a7570; --border: #d4cec4; --card: #faf8f4; --green: #2a7a4f; }
+  body { font-family: 'Sora', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+  header { padding: 3rem 2rem 2rem; max-width: 900px; margin: 0 auto; }
+  .eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+  h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); line-height: 1.05; letter-spacing: -0.02em; }
+  h1 em { font-style: italic; color: var(--accent); }
+  header p { font-size: 14px; color: var(--muted); margin-top: 0.75rem; max-width: 480px; line-height: 1.7; font-weight: 300; }
+  hr { border: none; border-top: 1.5px solid var(--ink); margin: 2rem 0 0; }
+  main { max-width: 900px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+  @media(max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  .field-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; margin-top: 1.25rem; }
+  .field-row:first-of-type { margin-top: 0; }
+  .form-label { font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .info-icon { width: 15px; height: 15px; border-radius: 50%; background: var(--border); color: var(--muted); font-size: 9px; font-family: 'DM Mono', monospace; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background 0.15s, color 0.15s; user-select: none; flex-shrink: 0; }
+  .info-icon:hover { background: var(--ink); color: var(--paper); }
+  .tooltip-box { display: none; position: absolute; left: 22px; top: 50%; transform: translateY(-50%); background: var(--ink); color: var(--paper); font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 300; line-height: 1.5; padding: 10px 13px; border-radius: 6px; width: 220px; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); pointer-events: none; }
+  .tooltip-box::before { content: ''; position: absolute; left: -6px; top: 50%; transform: translateY(-50%); border: 6px solid transparent; border-right-color: var(--ink); border-left: none; }
+  .info-icon:hover .tooltip-box { display: block; }
+
+  .input-wrap { display: flex; align-items: center; border: 1.5px solid var(--border); border-radius: 4px; background: var(--card); transition: border-color 0.2s; overflow: hidden; }
+  .input-wrap:focus-within { border-color: var(--ink); }
+  .input-prefix, .input-suffix { padding: 0 10px; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); background: var(--cream); height: 42px; display: flex; align-items: center; border-right: 1.5px solid var(--border); }
+  .input-suffix { border-right: none; border-left: 1.5px solid var(--border); }
+  input[type="number"] { width: 100%; height: 42px; padding: 0 12px; border: none; background: transparent; font-family: 'DM Mono', monospace; font-size: 15px; color: var(--ink); outline: none; -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  select { height: 42px; padding: 0 12px; border: 1.5px solid var(--border); border-radius: 4px; background: var(--card); font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7570' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }
+
+  .checkbox-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px; background: var(--cream); border: 1.5px solid var(--border); border-radius: 4px; margin-top: 1.25rem; cursor: pointer; transition: border-color 0.2s; }
+  .checkbox-card:hover { border-color: var(--ink); }
+  .checkbox-card input[type="checkbox"] { width: 16px; height: 16px; margin-top: 2px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+  .checkbox-card-text strong { display: block; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .checkbox-card-text span { font-size: 12px; color: var(--muted); font-weight: 300; }
+  .stepup-extra { display: none; padding: 14px; background: var(--cream); border: 1.5px solid var(--border); border-top: none; border-radius: 0 0 4px 4px; }
+  .stepup-extra.open { display: block; }
+  .stepup-row { display: flex; gap: 8px; align-items: flex-end; }
+  .stepup-row .input-wrap { flex: 1; }
+
+  .cta-btn { display: block; width: 100%; margin-top: 1.5rem; padding: 13px 20px; background: var(--ink); color: var(--paper); border: none; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+  .cta-btn:hover { background: #2a2a2a; }
+  .cta-btn:active { transform: scale(0.98); }
+
+  .results-heading { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--muted); margin-bottom: 1rem; font-style: italic; }
+  .metric-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .metric-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; padding: 14px 16px; }
+  .metric-card.accent-card { background: var(--ink); border-color: var(--ink); grid-column: 1 / -1; }
+  .mc-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .accent-card .mc-label { color: rgba(255,255,255,0.6); }
+  .mc-value { font-family: 'DM Serif Display', serif; font-size: 1.7rem; color: var(--ink); line-height: 1; }
+  .accent-card .mc-value { color: #fff; font-size: 2rem; }
+  .mc-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .accent-card .mc-sub { color: rgba(255,255,255,0.6); }
+  .mc-value.green { color: var(--green); }
+
+  .chart-container { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; padding: 16px; margin-top: 1rem; }
+  .chart-legend { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .chart-wrap { position: relative; width: 100%; height: 200px; }
+
+  .gap-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin: 1.25rem 0 0.5rem; }
+  .schedule-scroll { max-height: 260px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 4px; }
+  .schedule-scroll::-webkit-scrollbar { width: 4px; }
+  .schedule-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .schedule-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'DM Mono', monospace; }
+  .schedule-table th { text-align: right; padding: 6px 8px; color: var(--muted); font-weight: 400; border-bottom: 1.5px solid var(--ink); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .schedule-table th:first-child { text-align: left; }
+  .schedule-table td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  .schedule-table td:first-child { text-align: left; color: var(--muted); }
+  .schedule-table tr:last-child td { border-bottom: none; }
+  .gain-cell { color: var(--green); }
+  .hidden { display: none !important; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .anim { animation: fadeIn 0.4s ease; }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Investment Planning Tool</div>
+  <h1>How Long Should<br/><em>I Invest?</em></h1>
+  <p>Enter your target corpus and monthly SIP to find out exactly how long it will take to reach your goal.</p>
+  <hr />
+</header>
+<main>
+  <div class="two-col">
+    <div>
+      <div class="field-row"><label class="form-label">Target Amount</label><span class="info-icon">i<span class="tooltip-box">The total corpus you want to accumulate — e.g. a home down payment, child's education fund, or retirement target.</span></span></div>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="target" value="5000000" min="1000" /></div>
+
+      <div class="field-row"><label class="form-label">Expected Annual Return</label><span class="info-icon">i<span class="tooltip-box">Expected yearly return from your investments. Equity mutual funds have historically delivered 10–14% p.a. over long horizons.</span></span></div>
+      <div class="input-wrap"><input type="number" id="rate" value="12" min="0.1" max="50" step="0.1" /><span class="input-suffix">%</span></div>
+
+      <div class="field-row"><label class="form-label">Monthly Contribution</label><span class="info-icon">i<span class="tooltip-box">How much you can invest each month. The calculator tells you how long it takes to reach your target with this amount.</span></span></div>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="monthly" value="10000" min="100" /></div>
+
+      <label class="checkbox-card" for="stepup-toggle">
+        <input type="checkbox" id="stepup-toggle" onchange="toggleStepup()" />
+        <div class="checkbox-card-text"><strong>Step-up SIP</strong><span>Increase your monthly SIP every year</span></div>
+      </label>
+      <div class="stepup-extra" id="stepup-extra">
+        <div class="field-row" style="margin-top:0;"><label class="form-label">Annual Increase</label><span class="info-icon">i<span class="tooltip-box">Increase your SIP each year by a % of the current amount or by a fixed rupee value. This helps reach your goal faster.</span></span></div>
+        <div class="stepup-row">
+          <div class="input-wrap"><input type="number" id="stepup-val" value="10" min="0" /></div>
+          <select id="stepup-type"><option value="percent">% per year</option><option value="fixed">Fixed ₹/yr</option></select>
+        </div>
+      </div>
+      <button class="cta-btn" onclick="calc()">Find Time Needed →</button>
+    </div>
+
+    <div id="results" style="display:none;" class="anim">
+      <div class="results-heading">Your projection</div>
+      <div class="metric-row">
+        <div class="metric-card accent-card">
+          <div class="mc-label">Time to Goal</div>
+          <div class="mc-value" id="r-time">—</div>
+          <div class="mc-sub" id="r-sub">—</div>
+        </div>
+        <div class="metric-card"><div class="mc-label">Total Invested</div><div class="mc-value" id="r-invested">—</div></div>
+        <div class="metric-card"><div class="mc-label">Est. Returns</div><div class="mc-value green" id="r-returns">—</div></div>
+      </div>
+      <div class="chart-container">
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#c8962f;"></span>Invested</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#2f6fc8;"></span>Portfolio Value</span>
+        </div>
+        <div class="chart-wrap"><canvas id="chart"></canvas></div>
+      </div>
+      <div id="schedule-wrap" class="hidden">
+        <div class="gap-label">Year-wise schedule</div>
+        <div class="schedule-scroll">
+          <table class="schedule-table">
+            <thead><tr><th>Year</th><th>Monthly SIP</th><th>Invested</th><th>Value</th><th>Gain</th></tr></thead>
+            <tbody id="schedule-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+  let chartInst = null;
+  function fmt(n) { n=Math.round(n); if(n>=1e7) return '₹'+(n/1e7).toFixed(2)+' Cr'; if(n>=1e5) return '₹'+(n/1e5).toFixed(2)+' L'; return '₹'+n.toLocaleString('en-IN'); }
+  function fmtS(n) { n=Math.round(n); if(n>=1e7) return '₹'+(n/1e7).toFixed(1)+'Cr'; if(n>=1e5) return '₹'+(n/1e5).toFixed(0)+'L'; return '₹'+Math.round(n/1000)+'k'; }
+  function gv(id) { return parseFloat(document.getElementById(id).value)||0; }
+
+  function toggleStepup() {
+    const on = document.getElementById('stepup-toggle').checked;
+    document.getElementById('stepup-extra').classList.toggle('open', on);
+    const card = document.getElementById('stepup-toggle').closest('.checkbox-card');
+    card.style.borderRadius = on ? '4px 4px 0 0' : '4px';
+    card.style.borderBottom = on ? '1.5px solid transparent' : '';
+  }
+
+  function calc() {
+    const target = gv('target'), rate = gv('rate'), monthly = gv('monthly');
+    const isStep = document.getElementById('stepup-toggle').checked;
+    const sVal = gv('stepup-val'), sType = document.getElementById('stepup-type').value;
+    if (!target || !rate || !monthly) return;
+    const r = rate / 100 / 12;
+    let p = 0, inv = 0, months = 0, cur = monthly;
+    const labels = [], invD = [], valD = [], sched = [];
+    let yc = 0;
+    while (p < target && months < 720) {
+      for (let m = 0; m < 12 && p < target; m++) { p = (p + cur) * (1 + r); inv += cur; months++; }
+      yc++; labels.push('Y' + yc); invD.push(Math.round(inv)); valD.push(Math.round(Math.min(p, target * 1.05)));
+      sched.push({ y: yc, cur, inv, p });
+      if (isStep && sVal > 0) cur = sType === 'percent' ? cur * (1 + sVal/100) : cur + sVal;
+      if (p >= target) break;
+    }
+    const yrs = Math.floor(months/12), mths = months % 12;
+    const tStr = months >= 720 ? '60+ years' : (yrs > 0 ? yrs + ' yr' + (yrs>1?'s':'') : '') + (mths > 0 ? (yrs>0?' & ':'')+mths+' mo' : '');
+    document.getElementById('r-time').textContent = tStr;
+    document.getElementById('r-sub').textContent = months >= 720 ? 'Increase contribution to reach goal faster' : `to reach ${fmt(target)} at ${rate}% p.a.`;
+    document.getElementById('r-invested').textContent = fmt(inv);
+    document.getElementById('r-returns').textContent = fmt(p - inv);
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('schedule-wrap').classList.toggle('hidden', !isStep);
+    if (isStep) document.getElementById('schedule-body').innerHTML = sched.map(s => `<tr><td>${s.y}</td><td>${fmt(s.cur)}</td><td>${fmt(s.inv)}</td><td>${fmt(s.p)}</td><td class="gain-cell">${fmt(s.p-s.inv)}</td></tr>`).join('');
+    if (chartInst) chartInst.destroy();
+    chartInst = new Chart(document.getElementById('chart').getContext('2d'), {
+      type: 'line',
+      data: { labels, datasets: [{ label:'Invested', data:invD, borderColor:'#c8962f', backgroundColor:'rgba(200,150,47,0.1)', fill:true, tension:0.35, pointRadius:0, borderWidth:2 }, { label:'Portfolio', data:valD, borderColor:'#2f6fc8', backgroundColor:'rgba(47,111,200,0.08)', fill:true, tension:0.35, pointRadius:0, borderWidth:2 }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+fmtS(ctx.raw)}} }, scales:{ x:{grid:{display:false},ticks:{color:'#7a7570',font:{size:10,family:'DM Mono'},maxTicksLimit:10}}, y:{grid:{color:'rgba(0,0,0,0.06)'},ticks:{color:'#7a7570',font:{size:10,family:'DM Mono'},callback:v=>fmtS(v)}} } }
+    });
+  }
+</script>
+</body>
+</html>

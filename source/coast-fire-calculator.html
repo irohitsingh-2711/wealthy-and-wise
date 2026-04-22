@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Coast FIRE Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --ink: #0e0e0e; --paper: #f5f1ea; --cream: #ede8de; --accent: #c84b2f; --muted: #7a7570; --border: #d4cec4; --card: #faf8f4; --green: #2a7a4f; --fire: #e05a1a; --coast: #1a5c8a; --gold: #c8962f; }
+  body { font-family: 'Sora', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+  header { padding: 3rem 2rem 2rem; max-width: 1000px; margin: 0 auto; }
+  .eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+  h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); line-height: 1.05; letter-spacing: -0.02em; }
+  h1 em { font-style: italic; color: var(--coast); }
+  header p { font-size: 14px; color: var(--muted); margin-top: 0.75rem; max-width: 480px; line-height: 1.7; font-weight: 300; }
+  hr { border: none; border-top: 1.5px solid var(--ink); margin: 2rem 0 0; }
+  main { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+  @media(max-width: 660px) { .two-col { grid-template-columns: 1fr; } }
+
+  .info-box { background: var(--cream); border: 1.5px solid var(--border); border-radius: 4px; padding: 14px 16px; margin-bottom: 1.25rem; font-size: 13px; line-height: 1.6; color: var(--muted); }
+  .info-box strong { color: var(--ink); }
+
+  .field-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; margin-top: 1.25rem; }
+  .field-row:first-of-type { margin-top: 0; }
+  .form-label { font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .info-icon { width: 15px; height: 15px; border-radius: 50%; background: var(--border); color: var(--muted); font-size: 9px; font-family: 'DM Mono', monospace; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background 0.15s, color 0.15s; user-select: none; flex-shrink: 0; }
+  .info-icon:hover { background: var(--ink); color: var(--paper); }
+  .tooltip-box { display: none; position: absolute; left: 22px; top: 50%; transform: translateY(-50%); background: var(--ink); color: var(--paper); font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 300; line-height: 1.5; padding: 10px 13px; border-radius: 6px; width: 220px; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); pointer-events: none; }
+  .tooltip-box::before { content:''; position:absolute; left:-6px; top:50%; transform:translateY(-50%); border:6px solid transparent; border-right-color:var(--ink); border-left:none; }
+  .info-icon:hover .tooltip-box { display: block; }
+
+  .input-wrap { display: flex; align-items: center; border: 1.5px solid var(--border); border-radius: 4px; background: var(--card); transition: border-color 0.2s; overflow: hidden; }
+  .input-wrap:focus-within { border-color: var(--ink); }
+  .input-prefix, .input-suffix { padding: 0 10px; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); background: var(--cream); height: 42px; display: flex; align-items: center; border-right: 1.5px solid var(--border); }
+  .input-suffix { border-right: none; border-left: 1.5px solid var(--border); }
+  input[type="number"] { width: 100%; height: 42px; padding: 0 12px; border: none; background: transparent; font-family: 'DM Mono', monospace; font-size: 15px; color: var(--ink); outline: none; -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  select { height: 42px; padding: 0 12px; border: 1.5px solid var(--border); border-radius: 4px; background: var(--card); font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7570' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }
+
+  .checkbox-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px; background: var(--cream); border: 1.5px solid var(--border); border-radius: 4px; margin-top: 1.25rem; cursor: pointer; transition: border-color 0.2s; }
+  .checkbox-card:hover { border-color: var(--ink); }
+  .checkbox-card input[type="checkbox"] { width: 16px; height: 16px; margin-top: 2px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+  .checkbox-card-text strong { display: block; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .checkbox-card-text span { font-size: 12px; color: var(--muted); font-weight: 300; }
+  .stepup-extra { display: none; padding: 14px; background: var(--cream); border: 1.5px solid var(--border); border-top: none; border-radius: 0 0 4px 4px; }
+  .stepup-extra.open { display: block; }
+  .stepup-row { display: flex; gap: 8px; align-items: flex-end; }
+  .stepup-row .input-wrap { flex: 1; }
+
+  .cta-btn { display: block; width: 100%; margin-top: 1.5rem; padding: 13px 20px; background: var(--ink); color: var(--paper); border: none; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+  .cta-btn:hover { background: #2a2a2a; }
+  .cta-btn:active { transform: scale(0.98); }
+
+  .results-heading { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--muted); margin-bottom: 1rem; font-style: italic; }
+  .metric-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .metric-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; padding: 14px 16px; }
+  .metric-card.coast-card { background: var(--coast); border-color: var(--coast); grid-column: 1 / -1; }
+  .mc-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .coast-card .mc-label { color: rgba(255,255,255,0.6); }
+  .mc-value { font-family: 'DM Serif Display', serif; font-size: 1.7rem; color: var(--ink); line-height: 1; }
+  .coast-card .mc-value { color: #fff; font-size: 2rem; }
+  .mc-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .coast-card .mc-sub { color: rgba(255,255,255,0.6); }
+  .mc-value.green { color: var(--green); }
+
+  .progress-wrap { margin-top: 1rem; }
+  .progress-label-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .progress-label-row span { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .progress-track { height: 8px; background: var(--cream); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; background: var(--coast); }
+
+  .milestone-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
+  .milestone-card { border: 1.5px solid var(--border); border-radius: 4px; padding: 12px 14px; background: var(--card); }
+  .milestone-card .m-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .milestone-card .m-val { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--ink); }
+  .milestone-card .m-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .coast-path { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; padding: 16px; margin-top: 1rem; }
+  .coast-phase { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .coast-phase:last-child { border-bottom: none; }
+  .phase-num { width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: var(--paper); font-family: 'DM Mono', monospace; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .phase-body strong { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
+  .phase-body span { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  .chart-container { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; padding: 16px; margin-top: 1rem; }
+  .chart-legend { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .chart-wrap { position: relative; width: 100%; height: 200px; }
+
+  .gap-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin: 1.25rem 0 0.5rem; }
+  .hidden { display: none !important; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .anim { animation: fadeIn 0.4s ease; }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Financial Independence Tool</div>
+  <h1><em>Coast FIRE</em> Calculator</h1>
+  <p>Find the point where you can stop investing entirely and let compounding carry you to retirement.</p>
+  <hr />
+</header>
+<main>
+  <div class="two-col">
+    <div>
+      <div class="info-box"><strong>Coast FIRE</strong> is the point where your existing portfolio, left untouched, will grow to your FIRE number by retirement — without any further contributions. After this, you only need to cover living expenses.</div>
+
+      <div class="field-row"><label class="form-label">Current Age</label><span class="info-icon">i<span class="tooltip-box">Your age today. Determines how many years your portfolio has to compound before retirement.</span></span></div>
+      <div class="input-wrap"><input type="number" id="age" value="30" min="18" max="70" /><span class="input-suffix">yrs</span></div>
+
+      <div class="field-row"><label class="form-label">Target Retirement Age</label><span class="info-icon">i<span class="tooltip-box">When you want to fully retire. The longer this is from today, the smaller your Coast FIRE number — since your money has more time to compound.</span></span></div>
+      <div class="input-wrap"><input type="number" id="retire-age" value="55" min="25" max="80" /><span class="input-suffix">yrs</span></div>
+
+      <div class="field-row"><label class="form-label">Monthly Expenses (Today)</label><span class="info-icon">i<span class="tooltip-box">Your current monthly spending, used to calculate inflation-adjusted expenses at retirement and derive your full FIRE number.</span></span></div>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="expenses" value="60000" min="1000" /></div>
+
+      <div class="field-row"><label class="form-label">Expected Inflation</label><span class="info-icon">i<span class="tooltip-box">Annual rate at which costs rise. India's long-run CPI inflation is ~6%. This inflates your future expense needs and thus your FIRE number.</span></span></div>
+      <div class="input-wrap"><input type="number" id="inflation" value="6" min="0" max="20" step="0.1" /><span class="input-suffix">%</span></div>
+
+      <div class="field-row"><label class="form-label">Expected Annual Return</label><span class="info-icon">i<span class="tooltip-box">The average return your portfolio earns per year during both accumulation and coasting phases.</span></span></div>
+      <div class="input-wrap"><input type="number" id="growth" value="12" min="1" max="30" step="0.1" /><span class="input-suffix">%</span></div>
+
+      <div class="field-row"><label class="form-label">Safe Withdrawal Rate</label><span class="info-icon">i<span class="tooltip-box">The annual % of your corpus you withdraw in retirement. 4% implies 25× corpus. Lower rates like 3% are safer for early/long retirements.</span></span></div>
+      <div class="input-wrap"><input type="number" id="swr" value="4" min="1" max="10" step="0.1" /><span class="input-suffix">%</span></div>
+
+      <div class="field-row"><label class="form-label">Current Portfolio Value</label><span class="info-icon">i<span class="tooltip-box">The total value of your existing investments today. The larger this is, the sooner you hit Coast FIRE — since existing wealth compounds over time.</span></span></div>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="current" value="500000" min="0" /></div>
+
+      <div class="field-row"><label class="form-label">Monthly SIP (to reach Coast FIRE)</label><span class="info-icon">i<span class="tooltip-box">How much you invest each month during accumulation. Once you hit your Coast FIRE number, you can stop contributing entirely.</span></span></div>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="monthly" value="15000" min="0" /></div>
+
+      <label class="checkbox-card" for="stepup-toggle">
+        <input type="checkbox" id="stepup-toggle" onchange="toggleStepup()" />
+        <div class="checkbox-card-text"><strong>Step-up SIP</strong><span>Increase your monthly contribution every year</span></div>
+      </label>
+      <div class="stepup-extra" id="stepup-extra">
+        <div class="field-row" style="margin-top:0;"><label class="form-label">Annual Increase</label><span class="info-icon">i<span class="tooltip-box">Raise your Coast FIRE SIP each year to reach the Coast FIRE number sooner.</span></span></div>
+        <div class="stepup-row">
+          <div class="input-wrap"><input type="number" id="stepup-val" value="10" min="0" /></div>
+          <select id="stepup-type"><option value="percent">% per year</option><option value="fixed">Fixed ₹/yr</option></select>
+        </div>
+      </div>
+      <button class="cta-btn" onclick="calc()">Calculate Coast FIRE →</button>
+    </div>
+
+    <div>
+      <div id="results" style="display:none;" class="anim">
+        <div class="results-heading">Your Coast FIRE plan</div>
+        <div class="metric-row">
+          <div class="metric-card coast-card"><div class="mc-label">Coast FIRE Number</div><div class="mc-value" id="r-number">—</div><div class="mc-sub" id="r-sub">—</div></div>
+          <div class="metric-card"><div class="mc-label">Full FIRE Target</div><div class="mc-value" id="r-fire">—</div></div>
+          <div class="metric-card"><div class="mc-label">Current Portfolio</div><div class="mc-value" id="r-current">—</div></div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label-row"><span>Progress to Coast FIRE</span><span id="r-pct">0%</span></div>
+          <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%;"></div></div>
+        </div>
+        <div class="milestone-row">
+          <div class="milestone-card"><div class="m-label">Years to Coast FIRE</div><div class="m-val" id="r-years">—</div><div class="m-sub">time to stop investing</div></div>
+          <div class="milestone-card"><div class="m-label">Coast FIRE Age</div><div class="m-val" id="r-age">—</div><div class="m-sub">when you can coast</div></div>
+          <div class="milestone-card"><div class="m-label">Total Invested to Coast</div><div class="m-val" id="r-invested">—</div><div class="m-sub">contributions until coast</div></div>
+          <div class="milestone-card"><div class="m-label">Coasting Period</div><div class="m-val" id="r-coast-period">—</div><div class="m-sub">years of zero investing</div></div>
+        </div>
+        <div class="coast-path">
+          <div class="gap-label" style="margin-top:0;margin-bottom:1rem;">Your Coast FIRE journey</div>
+          <div class="coast-phase"><div class="phase-num">1</div><div class="phase-body"><strong>Accumulation Phase</strong><span id="phase1-text">Invest aggressively until you hit your Coast FIRE number.</span></div></div>
+          <div class="coast-phase"><div class="phase-num">2</div><div class="phase-body"><strong>Coasting Phase</strong><span id="phase2-text">Stop contributing. Let compounding do the work.</span></div></div>
+          <div class="coast-phase"><div class="phase-num">3</div><div class="phase-body"><strong>Retirement</strong><span id="phase3-text">Your corpus has grown to your full FIRE number.</span></div></div>
+        </div>
+        <div class="chart-container">
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot" style="background:#c8962f;"></span>Portfolio Growth</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#e05a1a;"></span>FIRE Target</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#1a5c8a;"></span>Coast FIRE Threshold</span>
+          </div>
+          <div class="chart-wrap"><canvas id="chart"></canvas></div>
+        </div>
+      </div>
+      <div id="error" style="display:none;" class="anim"></div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+  let chartInst = null;
+  function fmt(n) { n=Math.round(n); if(n>=1e7) return '₹'+(n/1e7).toFixed(2)+' Cr'; if(n>=1e5) return '₹'+(n/1e5).toFixed(2)+' L'; return '₹'+n.toLocaleString('en-IN'); }
+  function fmtS(n) { n=Math.round(n); if(n>=1e7) return '₹'+(n/1e7).toFixed(1)+'Cr'; if(n>=1e5) return '₹'+(n/1e5).toFixed(0)+'L'; return '₹'+Math.round(n/1000)+'k'; }
+  function gv(id) { return parseFloat(document.getElementById(id).value)||0; }
+
+  function toggleStepup() {
+    const on = document.getElementById('stepup-toggle').checked;
+    document.getElementById('stepup-extra').classList.toggle('open', on);
+    const card = document.getElementById('stepup-toggle').closest('.checkbox-card');
+    card.style.borderRadius = on ? '4px 4px 0 0' : '4px';
+    card.style.borderBottom = on ? '1.5px solid transparent' : '';
+  }
+
+  function calc() {
+    const curAge=gv('age'), retireAge=gv('retire-age'), monthlyExp=gv('expenses');
+    const inflation=gv('inflation')/100, growth=gv('growth')/100;
+    const swr=gv('swr')/100, currentPort=gv('current'), monthly=gv('monthly');
+    const isStep=document.getElementById('stepup-toggle').checked;
+    const sVal=gv('stepup-val'), sType=document.getElementById('stepup-type').value;
+    if (!curAge||!retireAge||!monthlyExp) return;
+    const ytr=retireAge-curAge;
+    const annExp=monthlyExp*12*Math.pow(1+inflation,ytr);
+    const fireNum=annExp/swr;
+    const coastNum=fireNum/Math.pow(1+growth,ytr);
+    const r=growth/12;
+    let p=currentPort, inv=0, coastAge=null, coastYears=null, cur=monthly;
+    const labels=[], portD=[], fireD=[], coastD=[];
+    for (let y=0;y<=ytr;y++) {
+      const age=curAge+y;
+      labels.push(age); portD.push(Math.round(p)); fireD.push(Math.round(fireNum));
+      coastD.push(Math.round(fireNum/Math.pow(1+growth,retireAge-age)));
+      if (p>=coastNum&&coastAge===null) { coastAge=age; coastYears=y; }
+      if (y<ytr) {
+        const contrib=coastAge===null;
+        for (let m=0;m<12;m++) { p=(p+(contrib?cur:0))*(1+r); if(contrib) inv+=cur; }
+        if (contrib&&isStep&&sVal>0) cur=sType==='percent'?cur*(1+sVal/100):cur+sVal;
+      }
+    }
+
+    // Not reachable
+    if (coastAge===null) {
+      const n=ytr*12, fvF=Math.pow(1+r,n), annF=(fvF-1)/r;
+      const reqSIP=Math.max(0,(coastNum-currentPort*fvF)/annF);
+      const sipDiff=Math.ceil(reqSIP-monthly);
+      let p2=currentPort, extraM=0;
+      while(p2<coastNum&&extraM<720){p2=(p2+monthly)*(1+r);extraM++;}
+      const extraYears=Math.ceil(extraM/12);
+      document.getElementById('results').style.display='none';
+      const errEl=document.getElementById('error');
+      errEl.style.display='block';
+      errEl.innerHTML=`
+        <div style="background:var(--ink);border-radius:4px;padding:2rem;color:var(--paper);margin-bottom:1rem;">
+          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#aaa;margin-bottom:8px;">Coast FIRE Not Reachable</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:1.6rem;line-height:1.2;margin-bottom:6px;">Your SIP won't reach the<br/>Coast FIRE number in time.</div>
+          <div style="font-size:13px;color:#aaa;font-weight:300;">Coast FIRE target: <strong style="color:#fff;">${fmt(coastNum)}</strong> &nbsp;·&nbsp; Projected at retirement: <strong style="color:#fff;">${fmt(portD[portD.length-1])}</strong></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:4px;padding:16px;">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Option 1 — Increase SIP</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--fire);">${fmt(reqSIP)}<span style="font-size:1rem;">/mo</span></div>
+            <div style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5;">Increase SIP by <strong style="color:var(--ink);">${fmt(sipDiff)}/mo</strong> to hit Coast FIRE by age ${retireAge}.</div>
+          </div>
+          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:4px;padding:16px;">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Option 2 — Invest Longer</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--coast);">+${extraYears} yrs</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5;">Keep ${fmt(monthly)}/mo for <strong style="color:var(--ink);">${extraYears} more years</strong> (until age ${curAge+extraYears}).</div>
+          </div>
+        </div>`;
+      return;
+    }
+
+    document.getElementById('error').style.display='none';
+    const pct=Math.min(100,(currentPort/coastNum)*100);
+    const coastingPeriod=retireAge-coastAge;
+    document.getElementById('r-number').textContent=fmt(coastNum);
+    document.getElementById('r-sub').textContent=`Grows to ${fmt(fireNum)} by age ${retireAge} without contributions`;
+    document.getElementById('r-fire').textContent=fmt(fireNum);
+    document.getElementById('r-current').textContent=fmt(currentPort);
+    document.getElementById('r-pct').textContent=pct.toFixed(1)+'%';
+    document.getElementById('progress-fill').style.width=pct+'%';
+    document.getElementById('r-years').textContent=coastYears+' years';
+    document.getElementById('r-age').textContent='Age '+coastAge;
+    document.getElementById('r-invested').textContent=fmt(inv);
+    document.getElementById('r-coast-period').textContent=Math.max(0,coastingPeriod)+' years';
+    document.getElementById('phase1-text').textContent=`Invest ${fmt(monthly)}/mo${isStep?' (stepping up)':''} from age ${curAge} to age ${coastAge} (${coastYears} years). Total: ${fmt(inv)}.`;
+    document.getElementById('phase2-text').textContent=`From age ${coastAge} to ${retireAge} (${Math.max(0,coastingPeriod)} years), stop contributing. Corpus compounds at ${(growth*100).toFixed(1)}% p.a.`;
+    document.getElementById('phase3-text').textContent=`At age ${retireAge}, corpus reaches ${fmt(fireNum)}. Withdraw at ${(swr*100).toFixed(1)}% SWR = ${fmt((fireNum*swr)/12)}/month.`;
+    document.getElementById('results').style.display='block';
+    if (chartInst) chartInst.destroy();
+    chartInst=new Chart(document.getElementById('chart').getContext('2d'),{
+      type:'line',
+      data:{labels,datasets:[
+        {label:'Portfolio',data:portD,borderColor:'#c8962f',backgroundColor:'rgba(200,150,47,0.1)',fill:true,tension:0.4,pointRadius:0,borderWidth:2},
+        {label:'FIRE Target',data:fireD,borderColor:'#e05a1a',borderDash:[6,3],pointRadius:0,borderWidth:2,fill:false},
+        {label:'Coast FIRE',data:coastD,borderColor:'#1a5c8a',borderDash:[3,3],pointRadius:0,borderWidth:1.5,fill:false}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmtS(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#7a7570',font:{size:10,family:'DM Mono'}}},y:{grid:{color:'rgba(0,0,0,0.06)'},ticks:{color:'#7a7570',font:{size:10,family:'DM Mono'},callback:v=>fmtS(v)}}}}
+    });
+  }
+</script>
+</body>
+</html>

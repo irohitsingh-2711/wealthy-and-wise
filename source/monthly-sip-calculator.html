@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Monthly SIP Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #0e0e0e; --paper: #f5f1ea; --cream: #ede8de;
+    --accent: #c84b2f; --accent2: #2f6fc8; --gold: #c8962f;
+    --muted: #7a7570; --border: #d4cec4; --card: #faf8f4;
+    --green: #2a7a4f;
+  }
+  body { font-family: 'Sora', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+  header { padding: 3rem 2rem 2rem; max-width: 900px; margin: 0 auto; }
+  .eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+  h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); line-height: 1.05; letter-spacing: -0.02em; }
+  h1 em { font-style: italic; color: var(--accent); }
+  header p { font-size: 14px; color: var(--muted); margin-top: 0.75rem; max-width: 480px; line-height: 1.7; font-weight: 300; }
+  hr { border: none; border-top: 1.5px solid var(--ink); margin: 2rem 0 0; }
+  main { max-width: 900px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+  @media(max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* field + tooltip */
+  .field-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; margin-top: 1.25rem; }
+  .field-row:first-of-type { margin-top: 0; }
+  .form-label { font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .info-icon { width: 15px; height: 15px; border-radius: 50%; background: var(--border); color: var(--muted); font-size: 9px; font-family: 'DM Mono', monospace; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background 0.15s, color 0.15s; user-select: none; flex-shrink: 0; }
+  .info-icon:hover { background: var(--ink); color: var(--paper); }
+  .tooltip-box { display: none; position: absolute; left: 22px; top: 50%; transform: translateY(-50%); background: var(--ink); color: var(--paper); font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 300; line-height: 1.5; padding: 10px 13px; border-radius: 6px; width: 220px; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); pointer-events: none; }
+  .tooltip-box::before { content: ''; position: absolute; left: -6px; top: 50%; transform: translateY(-50%); border: 6px solid transparent; border-right-color: var(--ink); border-left: none; }
+  .info-icon:hover .tooltip-box { display: block; }
+
+  /* inputs */
+  .input-wrap { display: flex; align-items: center; border: 1.5px solid var(--border); border-radius: 4px; background: var(--card); transition: border-color 0.2s; overflow: hidden; }
+  .input-wrap:focus-within { border-color: var(--ink); }
+  .input-prefix, .input-suffix { padding: 0 10px; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); background: var(--cream); height: 42px; display: flex; align-items: center; border-right: 1.5px solid var(--border); flex-shrink: 0; }
+  .input-suffix { border-right: none; border-left: 1.5px solid var(--border); }
+  input[type="number"] { width: 100%; height: 42px; padding: 0 12px; border: none; background: transparent; font-family: 'DM Mono', monospace; font-size: 15px; color: var(--ink); outline: none; -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  select { height: 42px; padding: 0 12px; border: 1.5px solid var(--border); border-radius: 4px; background: var(--card); font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7570' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }
+
+  /* step-up */
+  .checkbox-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px; background: var(--cream); border: 1.5px solid var(--border); border-radius: 4px; margin-top: 1.25rem; cursor: pointer; transition: border-color 0.2s; }
+  .checkbox-card:hover { border-color: var(--ink); }
+  .checkbox-card input[type="checkbox"] { width: 16px; height: 16px; margin-top: 2px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+  .checkbox-card-text strong { display: block; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .checkbox-card-text span { font-size: 12px; color: var(--muted); font-weight: 300; }
+  .stepup-extra { display: none; padding: 14px; background: var(--cream); border: 1.5px solid var(--border); border-top: none; border-radius: 0 0 4px 4px; }
+  .stepup-extra.open { display: block; }
+  .stepup-row { display: flex; gap: 8px; align-items: flex-end; }
+  .stepup-row .input-wrap { flex: 1; }
+
+  .cta-btn { display: block; width: 100%; margin-top: 1.5rem; padding: 13px 20px; background: var(--ink); color: var(--paper); border: none; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+  .cta-btn:hover { background: #2a2a2a; }
+  .cta-btn:active { transform: scale(0.98); }
+
+  /* hero result */
+  .hero-card { background: var(--ink); border-radius: 4px; padding: 2rem 2rem 1.75rem; margin-bottom: 1rem; text-align: center; }
+  .hero-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
+  .hero-value { font-family: 'DM Serif Display', serif; font-size: clamp(2.6rem, 8vw, 4rem); color: #fff; line-height: 1; }
+  .hero-value span { font-size: 1.4rem; opacity: 0.7; }
+  .hero-sub { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 10px; font-weight: 300; }
+
+  /* metric cards */
+  .metric-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .metric-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; padding: 14px 16px; }
+  .mc-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .mc-value { font-family: 'DM Serif Display', serif; font-size: 1.55rem; color: var(--ink); line-height: 1; }
+  .mc-value.green { color: var(--green); }
+  .mc-sub { font-size: 11px; color: var(--muted); margin-top: 4px; font-weight: 300; }
+
+  /* comparison strip */
+  .compare-strip { background: var(--cream); border: 1.5px solid var(--border); border-radius: 4px; padding: 14px 16px; margin-bottom: 1rem; }
+  .compare-title { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .compare-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .compare-row:last-child { margin-bottom: 0; }
+  .compare-label { font-size: 12px; color: var(--muted); font-weight: 300; }
+  .compare-val { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--ink); font-weight: 500; }
+  .compare-bar-wrap { flex: 1; margin: 0 12px; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .compare-bar { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+  /* chart */
+  .chart-container { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; padding: 16px; margin-bottom: 1rem; }
+  .chart-legend { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .chart-wrap { position: relative; width: 100%; height: 200px; }
+
+  /* schedule */
+  .gap-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin: 0 0 0.5rem; }
+  .schedule-scroll { max-height: 240px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 4px; }
+  .schedule-scroll::-webkit-scrollbar { width: 4px; }
+  .schedule-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .schedule-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'DM Mono', monospace; }
+  .schedule-table th { text-align: right; padding: 6px 8px; color: var(--muted); font-weight: 400; border-bottom: 1.5px solid var(--ink); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .schedule-table th:first-child { text-align: left; }
+  .schedule-table td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--ink); }
+  .schedule-table td:first-child { text-align: left; color: var(--muted); }
+  .schedule-table tr:last-child td { border-bottom: none; }
+  .gain-cell { color: var(--green); }
+
+  .results-heading { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--muted); margin-bottom: 1rem; font-style: italic; }
+  .hidden { display: none !important; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .anim { animation: fadeIn 0.4s ease; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Investment Planning Tool</div>
+  <h1>How Much Should<br/><em>I Invest?</em></h1>
+  <p>Enter your goal, timeline, and expected returns — we'll tell you exactly how much to invest every month to get there.</p>
+  <hr />
+</header>
+
+<main>
+  <div class="two-col">
+
+    <!-- FORM -->
+    <div>
+      <div class="field-row"><label class="form-label">Target Amount</label><span class="info-icon">i<span class="tooltip-box">The corpus you want to build — a home down payment, child's education, wedding fund, or retirement nest egg.</span></span></div>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="target" value="5000000" min="1000" /></div>
+
+      <div class="field-row"><label class="form-label">Time Period</label><span class="info-icon">i<span class="tooltip-box">How many years you have to reach your goal. More time means a lower required monthly SIP due to the power of compounding.</span></span></div>
+      <div class="input-wrap"><input type="number" id="years" value="10" min="1" max="50" /><span class="input-suffix">yrs</span></div>
+
+      <div class="field-row"><label class="form-label">Expected Annual Return</label><span class="info-icon">i<span class="tooltip-box">The average yearly return you expect from your investments. Equity mutual funds have historically returned 10–14% p.a. over long horizons in India.</span></span></div>
+      <div class="input-wrap"><input type="number" id="rate" value="12" min="0.1" max="50" step="0.1" /><span class="input-suffix">%</span></div>
+
+      <div class="field-row"><label class="form-label">Existing Savings (Optional)</label><span class="info-icon">i<span class="tooltip-box">Any amount you've already saved toward this goal. This head-start reduces how much you need to invest monthly.</span></span></div>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="existing" value="0" min="0" /></div>
+
+      <!-- Step-up toggle -->
+      <label class="checkbox-card" for="stepup-toggle">
+        <input type="checkbox" id="stepup-toggle" onchange="toggleStepup()" />
+        <div class="checkbox-card-text">
+          <strong>Step-up SIP</strong>
+          <span>I can increase my SIP amount every year</span>
+        </div>
+      </label>
+      <div class="stepup-extra" id="stepup-extra">
+        <div class="field-row" style="margin-top:0;">
+          <label class="form-label">Annual Increase</label>
+          <span class="info-icon">i<span class="tooltip-box">How much you plan to raise your SIP each year — as a % of the current amount or a fixed rupee value. A 10% step-up can significantly cut your starting SIP.</span></span>
+        </div>
+        <div class="stepup-row">
+          <div class="input-wrap"><input type="number" id="stepup-val" value="10" min="1" /></div>
+          <select id="stepup-type" style="width:150px;">
+            <option value="percent">% per year</option>
+            <option value="fixed">Fixed ₹/yr</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="cta-btn" onclick="calc()">Calculate My SIP →</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results" style="display:none;" class="anim">
+      <div class="results-heading">Your required SIP</div>
+
+      <div class="hero-card">
+        <div class="hero-label">Start investing</div>
+        <div class="hero-value" id="r-sip">—</div>
+        <div class="hero-sub" id="r-hero-sub">— every month to reach your goal</div>
+      </div>
+
+      <div class="metric-row">
+        <div class="metric-card">
+          <div class="mc-label">Total You'll Invest</div>
+          <div class="mc-value" id="r-invested">—</div>
+          <div class="mc-sub">out of pocket</div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-label">Returns Earned</div>
+          <div class="mc-value green" id="r-returns">—</div>
+          <div class="mc-sub">from compounding</div>
+        </div>
+      </div>
+
+      <!-- wealth ratio comparison -->
+      <div class="compare-strip" id="compare-strip">
+        <div class="compare-title">How your money grows</div>
+        <div class="compare-row">
+          <span class="compare-label">Amount invested</span>
+          <div class="compare-bar-wrap"><div class="compare-bar" id="bar-invested" style="background:#c8962f;"></div></div>
+          <span class="compare-val" id="cmp-invested">—</span>
+        </div>
+        <div class="compare-row">
+          <span class="compare-label">Returns earned</span>
+          <div class="compare-bar-wrap"><div class="compare-bar" id="bar-returns" style="background:#2a7a4f;"></div></div>
+          <span class="compare-val" id="cmp-returns">—</span>
+        </div>
+        <div class="compare-row">
+          <span class="compare-label">Total corpus</span>
+          <div class="compare-bar-wrap"><div class="compare-bar" id="bar-total" style="background:#2f6fc8; width:100%;"></div></div>
+          <span class="compare-val" id="cmp-total">—</span>
+        </div>
+      </div>
+
+      <!-- step-up savings callout -->
+      <div id="stepup-saving" class="hidden" style="background:var(--green-bg, #eef6f1);border:1.5px solid #b2d8c4;border-radius:4px;padding:14px 16px;margin-bottom:1rem;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:6px;">Step-up Advantage</div>
+        <div style="font-size:13px;color:#1a4a30;line-height:1.6;" id="stepup-saving-text">—</div>
+      </div>
+
+      <div class="chart-container">
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#c8962f;"></span>Invested</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#2f6fc8;"></span>Portfolio Value</span>
+        </div>
+        <div class="chart-wrap"><canvas id="chart"></canvas></div>
+      </div>
+
+      <div id="schedule-wrap" class="hidden">
+        <div class="gap-label">Year-wise schedule</div>
+        <div class="schedule-scroll">
+          <table class="schedule-table">
+            <thead>
+              <tr><th>Year</th><th>Monthly SIP</th><th>Invested</th><th>Value</th><th>Gain</th></tr>
+            </thead>
+            <tbody id="schedule-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+  let chartInst = null;
+
+  function fmt(n) { n = Math.round(n); if (n >= 1e7) return '₹' + (n/1e7).toFixed(2) + ' Cr'; if (n >= 1e5) return '₹' + (n/1e5).toFixed(2) + ' L'; return '₹' + n.toLocaleString('en-IN'); }
+  function fmtS(n) { n = Math.round(n); if (n >= 1e7) return '₹' + (n/1e7).toFixed(1) + 'Cr'; if (n >= 1e5) return '₹' + (n/1e5).toFixed(0) + 'L'; return '₹' + Math.round(n/1000) + 'k'; }
+  function gv(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+  function toggleStepup() {
+    const on = document.getElementById('stepup-toggle').checked;
+    document.getElementById('stepup-extra').classList.toggle('open', on);
+    const card = document.getElementById('stepup-toggle').closest('.checkbox-card');
+    card.style.borderRadius = on ? '4px 4px 0 0' : '4px';
+    card.style.borderBottom = on ? '1.5px solid transparent' : '';
+  }
+
+  // Solve for required SIP using annuity formula (no step-up)
+  // FV = SIP * [((1+r)^n - 1) / r] * (1+r)  +  existing * (1+r)^n = target
+  function solveFlat(target, existing, r, n) {
+    const fvExisting = existing * Math.pow(1 + r, n);
+    const remaining = target - fvExisting;
+    if (remaining <= 0) return 0;
+    const annuityFactor = ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+    return remaining / annuityFactor;
+  }
+
+  // Binary search for step-up SIP
+  function solveStepup(target, existing, r, months, stepupVal, stepupType) {
+    function simulate(sip) {
+      let p = existing, cur = sip;
+      for (let y = 0; y < months / 12; y++) {
+        for (let m = 0; m < 12; m++) p = (p + cur) * (1 + r);
+        if (stepupVal > 0) cur = stepupType === 'percent' ? cur * (1 + stepupVal/100) : cur + stepupVal;
+      }
+      return p;
+    }
+    let lo = 0, hi = target, mid;
+    for (let i = 0; i < 60; i++) {
+      mid = (lo + hi) / 2;
+      simulate(mid) < target ? lo = mid : hi = mid;
+    }
+    return mid;
+  }
+
+  function calc() {
+    const target = gv('target'), years = gv('years'), rate = gv('rate'), existing = gv('existing');
+    const isStep = document.getElementById('stepup-toggle').checked;
+    const sVal = gv('stepup-val'), sType = document.getElementById('stepup-type').value;
+    if (!target || !years || !rate) return;
+
+    const r = rate / 100 / 12;
+    const n = years * 12;
+
+    // Solve required SIP
+    let sip;
+    if (!isStep || sVal <= 0) {
+      sip = solveFlat(target, existing, r, n);
+    } else {
+      sip = solveStepup(target, existing, r, n, sVal, sType);
+    }
+    sip = Math.max(0, Math.ceil(sip));
+
+    // Also solve flat for comparison when step-up is on
+    const flatSip = Math.ceil(solveFlat(target, existing, r, n));
+
+    // Simulate year-by-year for chart + schedule
+    let p = existing, inv = 0, cur = sip;
+    const labels = [], invD = [], valD = [], sched = [];
+    for (let y = 1; y <= years; y++) {
+      for (let m = 0; m < 12; m++) { p = (p + cur) * (1 + r); inv += cur; }
+      labels.push('Y' + y); invD.push(Math.round(inv)); valD.push(Math.round(p));
+      sched.push({ y, cur, inv, p });
+      if (isStep && sVal > 0) cur = sType === 'percent' ? cur * (1 + sVal/100) : cur + sVal;
+    }
+    const totalInv = inv, totalReturns = p - inv;
+
+    // Update hero
+    document.getElementById('r-sip').innerHTML = `<span style="font-size:1.4rem;opacity:0.7;">₹</span>${Math.round(sip).toLocaleString('en-IN')}<span>/mo</span>`;
+    document.getElementById('r-hero-sub').textContent = `every month for ${years} year${years>1?'s':''} to reach ${fmt(target)}`;
+
+    document.getElementById('r-invested').textContent = fmt(totalInv);
+    document.getElementById('r-returns').textContent = fmt(totalReturns);
+
+    // Comparison bars
+    const maxV = Math.max(totalInv, totalReturns, target);
+    document.getElementById('bar-invested').style.width = (totalInv / maxV * 100).toFixed(1) + '%';
+    document.getElementById('bar-returns').style.width = (totalReturns / maxV * 100).toFixed(1) + '%';
+    document.getElementById('bar-total').style.width = '100%';
+    document.getElementById('cmp-invested').textContent = fmt(totalInv);
+    document.getElementById('cmp-returns').textContent = fmt(totalReturns);
+    document.getElementById('cmp-total').textContent = fmt(Math.round(p));
+
+    // Step-up saving callout
+    if (isStep && sVal > 0 && flatSip > sip) {
+      const saving = flatSip - sip;
+      document.getElementById('stepup-saving').classList.remove('hidden');
+      document.getElementById('stepup-saving-text').innerHTML =
+        `With a <strong>${sVal}${sType==='percent'?'%':' ₹'} annual step-up</strong>, your starting SIP is <strong>${fmt(sip)}/mo</strong> instead of <strong>${fmt(flatSip)}/mo</strong> — that's <strong>${fmt(saving)}/mo less</strong> to begin with.`;
+    } else {
+      document.getElementById('stepup-saving').classList.add('hidden');
+    }
+
+    // Schedule
+    document.getElementById('schedule-wrap').classList.toggle('hidden', !isStep);
+    if (isStep) {
+      document.getElementById('schedule-body').innerHTML = sched.map(s =>
+        `<tr><td>${s.y}</td><td>${fmt(s.cur)}</td><td>${fmt(s.inv)}</td><td>${fmt(s.p)}</td><td class="gain-cell">${fmt(s.p - s.inv)}</td></tr>`
+      ).join('');
+    }
+
+    document.getElementById('results').style.display = 'block';
+
+    // Chart
+    if (chartInst) chartInst.destroy();
+    chartInst = new Chart(document.getElementById('chart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Invested', data: invD, backgroundColor: '#c8962f', borderRadius: 2 },
+          { label: 'Portfolio Value', data: valD, backgroundColor: '#2f6fc8', borderRadius: 2 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + fmtS(ctx.raw) } } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#7a7570', font: { size: 10, family: 'DM Mono' }, maxTicksLimit: 12 } },
+          y: { grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { color: '#7a7570', font: { size: 10, family: 'DM Mono' }, callback: v => fmtS(v) } }
+        }
+      }
+    });
+  }
+</script>
+</body>
+</html>

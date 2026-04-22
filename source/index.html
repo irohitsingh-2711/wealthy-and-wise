@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wealthy and Wise — Finance Planner</title>
+<meta name="description" content="Free SIP, FIRE, Coast FIRE and real estate planning calculators built for the modern Indian investor. Plan your wealth with Wealthy and Wise." />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #0e0e0e; --paper: #f5f1ea; --cream: #ede8de;
+    --accent: #c84b2f; --accent2: #2f6fc8; --gold: #c8962f;
+    --muted: #7a7570; --border: #d4cec4; --card: #faf8f4;
+    --green: #2a7a4f; --fire: #e05a1a; --coast: #1a5c8a;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Sora', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+  /* ---- NAV ---- */
+  nav { max-width: 1000px; margin: 0 auto; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--ink); text-decoration: none; letter-spacing: -0.02em; }
+  .nav-logo em { font-style: italic; color: var(--accent); }
+  .nav-tag { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); background: var(--cream); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; }
+
+  /* ---- HERO ---- */
+  .hero { max-width: 1000px; margin: 0 auto; padding: 4rem 2rem 1rem; }
+  .hero-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2.8rem, 7vw, 5rem); line-height: 1.02; letter-spacing: -0.025em; max-width: 800px; }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-desc { font-size: 16px; color: var(--muted); margin-top: 1.5rem; max-width: 550px; line-height: 1.75; font-weight: 300; }
+  .hero-rule-inner { border: none; border-top: 1.5px solid var(--ink); margin: 3rem 2rem; }
+
+  /* ---- TOOLS GRID ---- */
+  .tools-section { max-width: 1000px; margin: 0 auto; padding: 0 2rem 5rem; }
+  .section-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.5rem; }
+  .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  @media(max-width: 768px) { .tools-grid { grid-template-columns: 1fr; } }
+  @media(min-width: 769px) and (max-width: 950px) { .tools-grid { grid-template-columns: 1fr 1fr; } }
+
+  .tool-card { background: var(--card); padding: 2rem; text-decoration: none; color: var(--ink); display: flex; flex-direction: column; transition: background 0.18s; position: relative; overflow: hidden; }
+  .tool-card:hover { background: var(--cream); }
+  .tool-card:hover .card-arrow { transform: translate(3px, -3px); color: var(--ink); }
+
+  .card-number { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--border); margin-bottom: 1.5rem; }
+  .card-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; font-size: 20px; }
+  .card-title { font-family: 'DM Serif Display', serif; font-size: 1.35rem; line-height: 1.2; margin-bottom: 0.75rem; color: var(--ink); }
+  .card-desc { font-size: 13px; color: var(--muted); line-height: 1.65; font-weight: 300; flex: 1; }
+  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 1.5rem; }
+  .card-tag { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--cream); border: 1px solid var(--border); border-radius: 20px; padding: 3px 8px; }
+  .card-arrow { position: absolute; top: 2rem; right: 2rem; font-size: 18px; color: var(--border); transition: transform 0.2s, color 0.2s; }
+
+  /* Featured Card (Spans 2 columns) */
+  .tool-card.featured { grid-column: span 2; background: var(--ink); }
+  .tool-card.featured:hover { background: #1a1a1a; }
+  .tool-card.featured .card-number { color: rgba(255,255,255,0.2); }
+  .tool-card.featured .card-title { color: #fff; font-size: 1.6rem; }
+  .tool-card.featured .card-desc { color: rgba(255,255,255,0.55); }
+  .tool-card.featured .card-tag { color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); }
+  .tool-card.featured .card-arrow { color: rgba(255,255,255,0.3); }
+  .tool-card.featured:hover .card-arrow { color: #fff; }
+  @media(max-width: 768px) { .tool-card.featured { grid-column: span 1; } }
+
+  /* ---- HOW IT WORKS ---- */
+  .how-section { max-width: 1000px; margin: 0 auto; padding: 0 2rem 5rem; }
+  .how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; margin-top: 2rem; }
+  @media(max-width: 640px) { .how-grid { grid-template-columns: 1fr; gap: 1.5rem; } }
+  .how-num { font-family: 'DM Serif Display', serif; font-size: 2.5rem; color: var(--border); line-height: 1; margin-bottom: 0.75rem; }
+  .how-title { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 0.5rem; }
+  .how-desc { font-size: 13.5px; color: var(--muted); line-height: 1.65; font-weight: 300; }
+
+  /* ---- FOOTER ---- */
+  footer { border-top: 1.5px solid var(--border); padding: 3rem 2rem; text-align: center; }
+  footer p { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Wealthy & <em>Wise</em></a>
+  <span class="nav-tag">No Signup · Free Tools</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">Finance Planner for the Indian Investor</div>
+  <h1>Precision tools for your <em>Wealthy</em> future and <em>Wise</em> retirement.</h1>
+  <p class="hero-desc">Plan your Financial Independence (FIRE), compare home ownership costs, and optimize your SIPs with our clean, inflation-aware toolset.</p>
+</div>
+
+<hr class="hero-rule-inner" />
+
+<div class="tools-section">
+  <div class="section-label">Financial Planning Suite</div>
+  <div class="tools-grid">
+
+    <a href="fire-calculator.html" class="tool-card featured">
+      <div class="card-number">01</div>
+      <div class="card-icon" style="background:rgba(224,90,26,0.15);">🔥</div>
+      <div class="card-title">FIRE Calculator</div>
+      <div class="card-desc">The primary tool for early retirement. Calculate your Financial Independence corpus based on the 4% rule, India-specific inflation, and step-up investment scenarios.</div>
+      <div class="card-tags">
+        <span class="card-tag">FIRE Number</span>
+        <span class="card-tag">SWR</span>
+        <span class="card-tag">Inflation-Adjusted</span>
+      </div>
+      <span class="card-arrow">↗</span>
+    </a>
+
+    <a href="coast-fire-calculator.html" class="tool-card">
+      <div class="card-number">02</div>
+      <div class="card-icon" style="background:rgba(26,92,138,0.1);">🌊</div>
+      <div class="card-title">Coast FIRE</div>
+      <div class="card-desc">Find the tipping point where your current portfolio will grow to meet your retirement goals without any further contributions.</div>
+      <div class="card-tags">
+        <span class="card-tag">Compounding</span>
+        <span class="card-tag">Milestones</span>
+      </div>
+      <span class="card-arrow">↗</span>
+    </a>
+
+    <a href="RentvsBuy.html" class="tool-card">
+      <div class="card-number">03</div>
+      <div class="card-icon" style="background:rgba(200,75,47,0.1);">🏠</div>
+      <div class="card-title">Rent vs Buy</div>
+      <div class="card-desc">A deep financial comparison between home ownership and renting + investing. Includes EMI, interest costs, and property appreciation.</div>
+      <div class="card-tags">
+        <span class="card-tag">Real Estate</span>
+        <span class="card-tag">EMI vs SIP</span>
+      </div>
+      <span class="card-arrow">↗</span>
+    </a>
+
+    <a href="monthly-sip-calculator.html" class="tool-card">
+      <div class="card-number">04</div>
+      <div class="card-icon" style="background:rgba(42,122,79,0.1);">🎯</div>
+      <div class="card-title">Goal Planning</div>
+      <div class="card-desc">Solve for the monthly SIP needed to reach a specific target corpus within a set number of years.</div>
+      <div class="card-tags">
+        <span class="card-tag">Goal-Based</span>
+        <span class="card-tag">Annuity</span>
+      </div>
+      <span class="card-arrow">↗</span>
+    </a>
+
+    <a href="sip-calculator.html" class="tool-card">
+      <div class="card-number">05</div>
+      <div class="card-icon" style="background:rgba(200,150,47,0.12);">📈</div>
+      <div class="card-title">SIP Calculator</div>
+      <div class="card-desc">A traditional SIP calculator with step-up support to project your portfolio's future value based on expected annual returns.</div>
+      <div class="card-tags">
+        <span class="card-tag">Growth</span>
+        <span class="card-tag">Returns</span>
+      </div>
+      <span class="card-arrow">↗</span>
+    </a>
+
+    <a href="sip-duration.html" class="tool-card">
+      <div class="card-number">06</div>
+      <div class="card-icon" style="background:rgba(47,111,200,0.1);">⏱️</div>
+      <div class="card-title">Time Estimator</div>
+      <div class="card-desc">Find out exactly how long it will take to reach your target corpus based on your current monthly contribution.</div>
+      <div class="card-tags">
+        <span class="card-tag">Timeline</span>
+        <span class="card-tag">Estimates</span>
+      </div>
+      <span class="card-arrow">↗</span>
+    </a>
+
+  </div>
+</div>
+
+<div class="how-section">
+  <div class="section-label">Financial Clarity in 3 Steps</div>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <div class="how-title">Choose Your Objective</div>
+      <div class="how-desc">Whether it's retiring early, buying a home, or hitting a specific savings target, pick the tool that matches your current goal.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <div class="how-title">Input Honest Data</div>
+      <div class="how-desc">Fill in your monthly expenses, existing corpus, and expected returns. Hover over the ⓘ icons for Indian market averages.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <div class="how-title">Execute the Plan</div>
+      <div class="how-desc">Review your wealth path through interactive charts and year-wise schedules to ensure your future is both Wealthy and Wise.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Wealthy and Wise &mdash; No data is stored &mdash; All calculations happen on your device</p>
+</footer>
+
+</body>
+</html>

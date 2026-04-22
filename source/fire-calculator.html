@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FIRE Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --ink: #0e0e0e; --paper: #f5f1ea; --cream: #ede8de; --accent: #c84b2f; --muted: #7a7570; --border: #d4cec4; --card: #faf8f4; --green: #2a7a4f; --fire: #e05a1a; --gold: #c8962f; }
+  body { font-family: 'Sora', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+  header { padding: 3rem 2rem 2rem; max-width: 1000px; margin: 0 auto; }
+  .eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+  h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); line-height: 1.05; letter-spacing: -0.02em; }
+  h1 em { font-style: italic; color: var(--fire); }
+  header p { font-size: 14px; color: var(--muted); margin-top: 0.75rem; max-width: 480px; line-height: 1.7; font-weight: 300; }
+  hr { border: none; border-top: 1.5px solid var(--ink); margin: 2rem 0 0; }
+  main { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+  @media(max-width: 660px) { .two-col { grid-template-columns: 1fr; } }
+
+  .info-box { background: var(--cream); border: 1.5px solid var(--border); border-radius: 4px; padding: 14px 16px; margin-bottom: 1.25rem; font-size: 13px; line-height: 1.6; color: var(--muted); }
+  .info-box strong { color: var(--ink); }
+
+  .field-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; margin-top: 1.25rem; }
+  .field-row:first-of-type { margin-top: 0; }
+  .form-label { font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .info-icon { width: 15px; height: 15px; border-radius: 50%; background: var(--border); color: var(--muted); font-size: 9px; font-family: 'DM Mono', monospace; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background 0.15s, color 0.15s; user-select: none; flex-shrink: 0; }
+  .info-icon:hover { background: var(--ink); color: var(--paper); }
+  .tooltip-box { display: none; position: absolute; left: 22px; top: 50%; transform: translateY(-50%); background: var(--ink); color: var(--paper); font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 300; line-height: 1.5; padding: 10px 13px; border-radius: 6px; width: 220px; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); pointer-events: none; }
+  .tooltip-box::before { content:''; position:absolute; left:-6px; top:50%; transform:translateY(-50%); border:6px solid transparent; border-right-color:var(--ink); border-left:none; }
+  .info-icon:hover .tooltip-box { display: block; }
+
+  .input-wrap { display: flex; align-items: center; border: 1.5px solid var(--border); border-radius: 4px; background: var(--card); transition: border-color 0.2s; overflow: hidden; }
+  .input-wrap:focus-within { border-color: var(--ink); }
+  .input-prefix, .input-suffix { padding: 0 10px; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); background: var(--cream); height: 42px; display: flex; align-items: center; border-right: 1.5px solid var(--border); }
+  .input-suffix { border-right: none; border-left: 1.5px solid var(--border); }
+  input[type="number"] { width: 100%; height: 42px; padding: 0 12px; border: none; background: transparent; font-family: 'DM Mono', monospace; font-size: 15px; color: var(--ink); outline: none; -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  select { height: 42px; padding: 0 12px; border: 1.5px solid var(--border); border-radius: 4px; background: var(--card); font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7570' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }
+
+  .checkbox-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px; background: var(--cream); border: 1.5px solid var(--border); border-radius: 4px; margin-top: 1.25rem; cursor: pointer; transition: border-color 0.2s; }
+  .checkbox-card:hover { border-color: var(--ink); }
+  .checkbox-card input[type="checkbox"] { width: 16px; height: 16px; margin-top: 2px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+  .checkbox-card-text strong { display: block; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .checkbox-card-text span { font-size: 12px; color: var(--muted); font-weight: 300; }
+  .stepup-extra { display: none; padding: 14px; background: var(--cream); border: 1.5px solid var(--border); border-top: none; border-radius: 0 0 4px 4px; }
+  .stepup-extra.open { display: block; }
+  .stepup-row { display: flex; gap: 8px; align-items: flex-end; }
+  .stepup-row .input-wrap { flex: 1; }
+
+  .cta-btn { display: block; width: 100%; margin-top: 1.5rem; padding: 13px 20px; background: var(--ink); color: var(--paper); border: none; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+  .cta-btn:hover { background: #2a2a2a; }
+  .cta-btn:active { transform: scale(0.98); }
+
+  .results-heading { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--muted); margin-bottom: 1rem; font-style: italic; }
+  .metric-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .metric-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; padding: 14px 16px; }
+  .metric-card.fire-card { background: var(--fire); border-color: var(--fire); grid-column: 1 / -1; }
+  .mc-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .fire-card .mc-label { color: rgba(255,255,255,0.6); }
+  .mc-value { font-family: 'DM Serif Display', serif; font-size: 1.7rem; color: var(--ink); line-height: 1; }
+  .fire-card .mc-value { color: #fff; font-size: 2rem; }
+  .mc-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .fire-card .mc-sub { color: rgba(255,255,255,0.6); }
+  .mc-value.green { color: var(--green); }
+
+  .progress-wrap { margin-top: 1rem; }
+  .progress-label-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .progress-label-row span { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .progress-track { height: 8px; background: var(--cream); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; background: var(--fire); }
+
+  .milestone-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
+  .milestone-card { border: 1.5px solid var(--border); border-radius: 4px; padding: 12px 14px; background: var(--card); }
+  .milestone-card .m-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .milestone-card .m-val { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--ink); }
+  .milestone-card .m-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .chart-container { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; padding: 16px; margin-top: 1rem; }
+  .chart-legend { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .chart-wrap { position: relative; width: 100%; height: 200px; }
+
+  .gap-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin: 1.25rem 0 0.5rem; }
+  .schedule-scroll { max-height: 260px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 4px; }
+  .schedule-scroll::-webkit-scrollbar { width: 4px; }
+  .schedule-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .schedule-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'DM Mono', monospace; }
+  .schedule-table th { text-align: right; padding: 6px 8px; color: var(--muted); font-weight: 400; border-bottom: 1.5px solid var(--ink); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .schedule-table th:first-child { text-align: left; }
+  .schedule-table td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  .schedule-table td:first-child { text-align: left; color: var(--muted); }
+  .schedule-table tr:last-child td { border-bottom: none; }
+  .hidden { display: none !important; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .anim { animation: fadeIn 0.4s ease; }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Financial Independence Tool</div>
+  <h1><em>FIRE</em> Calculator</h1>
+  <p>Calculate your Financial Independence number and see how long it will take to retire early.</p>
+  <hr />
+</header>
+<main>
+  <div class="two-col">
+    <div>
+      <div class="info-box">The <strong>FIRE number</strong> is the corpus you need to retire and live off investments forever — typically <strong>25× your annual expenses</strong> (the 4% rule).</div>
+
+      <div class="field-row"><label class="form-label">Current Age</label><span class="info-icon">i<span class="tooltip-box">Your age today. Used to calculate how many years you have to grow your portfolio before retirement.</span></span></div>
+      <div class="input-wrap"><input type="number" id="age" value="30" min="18" max="70" /><span class="input-suffix">yrs</span></div>
+
+      <div class="field-row"><label class="form-label">Target Retirement Age</label><span class="info-icon">i<span class="tooltip-box">The age at which you want to stop working entirely and live off your investment corpus.</span></span></div>
+      <div class="input-wrap"><input type="number" id="retire-age" value="50" min="25" max="80" /><span class="input-suffix">yrs</span></div>
+
+      <div class="field-row"><label class="form-label">Monthly Expenses (Today)</label><span class="info-icon">i<span class="tooltip-box">Your current monthly spending across all categories. This is adjusted for inflation to estimate expenses at retirement.</span></span></div>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="expenses" value="60000" min="1000" /></div>
+
+      <div class="field-row"><label class="form-label">Expected Inflation Rate</label><span class="info-icon">i<span class="tooltip-box">The annual rate at which cost of living rises. India's long-term CPI inflation has averaged ~6%. Higher inflation means you need a larger corpus.</span></span></div>
+      <div class="input-wrap"><input type="number" id="inflation" value="6" min="0" max="20" step="0.1" /><span class="input-suffix">%</span></div>
+
+      <div class="field-row"><label class="form-label">Portfolio Return (Pre-Retirement)</label><span class="info-icon">i<span class="tooltip-box">Expected annual return during accumulation. Typically higher as you can take more equity risk when younger.</span></span></div>
+      <div class="input-wrap"><input type="number" id="growth" value="12" min="1" max="30" step="0.1" /><span class="input-suffix">%</span></div>
+
+      <div class="field-row"><label class="form-label">Portfolio Return (Post-Retirement)</label><span class="info-icon">i<span class="tooltip-box">Expected return after retirement. Usually lower as you shift to a more conservative portfolio to reduce sequence-of-returns risk.</span></span></div>
+      <div class="input-wrap"><input type="number" id="post-growth" value="8" min="1" max="20" step="0.1" /><span class="input-suffix">%</span></div>
+
+      <div class="field-row"><label class="form-label">Current Savings / Portfolio</label><span class="info-icon">i<span class="tooltip-box">The total value of your existing investments today — mutual funds, stocks, PPF, FDs, etc. This head-start compounds significantly over time.</span></span></div>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="corpus" value="500000" min="0" /></div>
+
+      <div class="field-row"><label class="form-label">Monthly SIP Towards FIRE</label><span class="info-icon">i<span class="tooltip-box">How much you invest every month toward your FIRE goal, added on top of your existing portfolio each month.</span></span></div>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="monthly" value="25000" min="0" /></div>
+
+      <div class="field-row"><label class="form-label">Safe Withdrawal Rate</label><span class="info-icon">i<span class="tooltip-box">The % of your corpus you withdraw annually in retirement. The classic 4% rule implies 25× expenses. 3–3.5% is safer for longer retirements in India.</span></span></div>
+      <div class="input-wrap"><input type="number" id="swr" value="4" min="1" max="10" step="0.1" /><span class="input-suffix">%</span></div>
+
+      <label class="checkbox-card" for="stepup-toggle">
+        <input type="checkbox" id="stepup-toggle" onchange="toggleStepup()" />
+        <div class="checkbox-card-text"><strong>Step-up SIP</strong><span>Increase your monthly FIRE contribution every year</span></div>
+      </label>
+      <div class="stepup-extra" id="stepup-extra">
+        <div class="field-row" style="margin-top:0;"><label class="form-label">Annual Increase</label><span class="info-icon">i<span class="tooltip-box">Raise your FIRE SIP each year as your income grows — either a % of the current SIP or a fixed rupee step-up.</span></span></div>
+        <div class="stepup-row">
+          <div class="input-wrap"><input type="number" id="stepup-val" value="10" min="0" /></div>
+          <select id="stepup-type"><option value="percent">% per year</option><option value="fixed">Fixed ₹/yr</option></select>
+        </div>
+      </div>
+      <button class="cta-btn" onclick="calc()">Calculate FIRE Number →</button>
+    </div>
+
+    <div id="results" style="display:none;" class="anim">
+      <div class="results-heading">Your FIRE projection</div>
+      <div class="metric-row">
+        <div class="metric-card fire-card"><div class="mc-label">Your FIRE Number</div><div class="mc-value" id="r-number">—</div><div class="mc-sub" id="r-sub">—</div></div>
+        <div class="metric-card"><div class="mc-label">Projected Corpus</div><div class="mc-value green" id="r-corpus">—</div></div>
+        <div class="metric-card"><div class="mc-label">Gap / Surplus</div><div class="mc-value" id="r-gap">—</div></div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label-row"><span>Progress to FIRE</span><span id="r-pct">0%</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%;"></div></div>
+      </div>
+      <div class="milestone-row">
+        <div class="milestone-card"><div class="m-label">Inflation-adj. Monthly Spend</div><div class="m-val" id="r-spend">—</div><div class="m-sub">at retirement age</div></div>
+        <div class="milestone-card"><div class="m-label">Monthly Withdrawal</div><div class="m-val" id="r-withdraw">—</div><div class="m-sub">from corpus at SWR</div></div>
+        <div class="milestone-card"><div class="m-label">Years to FIRE</div><div class="m-val" id="r-years">—</div><div class="m-sub">from today</div></div>
+        <div class="milestone-card"><div class="m-label">Retirement Duration</div><div class="m-val" id="r-duration">—</div><div class="m-sub">assuming 90-yr lifespan</div></div>
+      </div>
+      <div class="chart-container">
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#c8962f;"></span>Projected Corpus</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#e05a1a;"></span>FIRE Number</span>
+        </div>
+        <div class="chart-wrap"><canvas id="chart"></canvas></div>
+      </div>
+      <div id="schedule-wrap" class="hidden">
+        <div class="gap-label">Year-wise schedule</div>
+        <div class="schedule-scroll">
+          <table class="schedule-table">
+            <thead><tr><th>Year / Age</th><th>Monthly SIP</th><th>Invested</th><th>Corpus</th><th>FIRE Target</th></tr></thead>
+            <tbody id="schedule-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+  let chartInst = null;
+  function fmt(n) { n=Math.round(n); if(n>=1e7) return '₹'+(n/1e7).toFixed(2)+' Cr'; if(n>=1e5) return '₹'+(n/1e5).toFixed(2)+' L'; return '₹'+n.toLocaleString('en-IN'); }
+  function fmtS(n) { n=Math.round(n); if(n>=1e7) return '₹'+(n/1e7).toFixed(1)+'Cr'; if(n>=1e5) return '₹'+(n/1e5).toFixed(0)+'L'; return '₹'+Math.round(n/1000)+'k'; }
+  function gv(id) { return parseFloat(document.getElementById(id).value)||0; }
+
+  function toggleStepup() {
+    const on = document.getElementById('stepup-toggle').checked;
+    document.getElementById('stepup-extra').classList.toggle('open', on);
+    const card = document.getElementById('stepup-toggle').closest('.checkbox-card');
+    card.style.borderRadius = on ? '4px 4px 0 0' : '4px';
+    card.style.borderBottom = on ? '1.5px solid transparent' : '';
+  }
+
+  function calc() {
+    const curAge=gv('age'), retireAge=gv('retire-age'), monthlyExp=gv('expenses');
+    const inflation=gv('inflation')/100, growth=gv('growth')/100;
+    const corpus0=gv('corpus'), monthly=gv('monthly'), swr=gv('swr')/100;
+    const isStep=document.getElementById('stepup-toggle').checked;
+    const sVal=gv('stepup-val'), sType=document.getElementById('stepup-type').value;
+    if (!curAge||!retireAge||!monthlyExp) return;
+    const yrs=retireAge-curAge;
+    const annExp=monthlyExp*12*Math.pow(1+inflation,yrs);
+    const fireNum=annExp/swr;
+    const r=growth/12;
+    let p=corpus0, inv=0, cur=monthly;
+    const labels=[], corpD=[], fireD=[], sched=[];
+    labels.push(curAge); corpD.push(Math.round(p)); fireD.push(Math.round(fireNum));
+    for (let y=1;y<=yrs;y++) {
+      for (let m=0;m<12;m++) { p=(p+cur)*(1+r); inv+=cur; }
+      labels.push(curAge+y); corpD.push(Math.round(p)); fireD.push(Math.round(fireNum));
+      sched.push({y,age:curAge+y,cur,inv,p,fire:fireNum});
+      if (isStep&&sVal>0) cur=sType==='percent'?cur*(1+sVal/100):cur+sVal;
+    }
+    const gap=p-fireNum, pct=Math.min(100,(p/fireNum)*100);
+    document.getElementById('r-number').textContent=fmt(fireNum);
+    document.getElementById('r-sub').textContent=`${fmt(annExp)}/yr ÷ ${(swr*100).toFixed(1)}% SWR`;
+    document.getElementById('r-corpus').textContent=fmt(p);
+    document.getElementById('r-gap').textContent=(gap>=0?'+':'-')+fmt(Math.abs(gap));
+    document.getElementById('r-gap').style.color=gap>=0?'var(--green)':'var(--accent)';
+    document.getElementById('r-pct').textContent=pct.toFixed(1)+'%';
+    document.getElementById('progress-fill').style.width=pct+'%';
+    document.getElementById('r-spend').textContent=fmt(annExp/12)+'/mo';
+    document.getElementById('r-withdraw').textContent=fmt((fireNum*swr)/12)+'/mo';
+    document.getElementById('r-years').textContent=yrs+' years';
+    document.getElementById('r-duration').textContent=Math.max(0,90-retireAge)+' years';
+    document.getElementById('results').style.display='block';
+    document.getElementById('schedule-wrap').classList.toggle('hidden',!isStep);
+    if (isStep) document.getElementById('schedule-body').innerHTML=sched.map(s=>`<tr><td>${s.y} / ${s.age}</td><td>${fmt(s.cur)}</td><td>${fmt(s.inv)}</td><td>${fmt(s.p)}</td><td>${fmt(s.fire)}</td></tr>`).join('');
+    if (chartInst) chartInst.destroy();
+    chartInst=new Chart(document.getElementById('chart').getContext('2d'),{
+      type:'line',
+      data:{labels,datasets:[{label:'Corpus',data:corpD,borderColor:'#c8962f',backgroundColor:'rgba(200,150,47,0.1)',fill:true,tension:0.4,pointRadius:0,borderWidth:2},{label:'FIRE',data:fireD,borderColor:'#e05a1a',borderDash:[6,3],pointRadius:0,borderWidth:2,fill:false}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmtS(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#7a7570',font:{size:10,family:'DM Mono'}}},y:{grid:{color:'rgba(0,0,0,0.06)'},ticks:{color:'#7a7570',font:{size:10,family:'DM Mono'},callback:v=>fmtS(v)}}}}
+    });
+  }
+</script>
+</body>
+</html>

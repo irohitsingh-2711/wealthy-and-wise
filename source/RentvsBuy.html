@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rent vs Buy Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #0e0e0e; --paper: #f5f1ea; --cream: #ede8de;
+    --accent: #c84b2f; --accent2: #2f6fc8; --gold: #c8962f;
+    --muted: #7a7570; --border: #d4cec4; --card: #faf8f4;
+    --green: #2a7a4f; --green-bg: #eef6f1; --green-border: #b2d8c4;
+    --buy: #c84b2f; --rent: #2f6fc8;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Sora', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+  header { padding: 3rem 2rem 2rem; max-width: 1000px; margin: 0 auto; }
+  .eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+  h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); line-height: 1.05; letter-spacing: -0.02em; }
+  h1 em { font-style: italic; color: var(--accent); }
+  header p { font-size: 14px; color: var(--muted); margin-top: 0.75rem; max-width: 520px; line-height: 1.7; font-weight: 300; }
+  hr.rule { border: none; border-top: 1.5px solid var(--ink); margin: 2rem 0 0; }
+
+  main { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+
+  .section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 1.25rem; }
+  .section-num { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--border); line-height: 1; }
+  .section-title { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--ink); }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
+  .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media(max-width: 680px) { .form-grid, .form-grid-2 { grid-template-columns: 1fr; } }
+
+  .field-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .form-label { font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .input-wrap { display: flex; align-items: center; border: 1.5px solid var(--border); border-radius: 4px; background: var(--card); overflow: hidden; }
+  .input-prefix, .input-suffix { padding: 0 10px; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); background: var(--cream); height: 42px; display: flex; align-items: center; border-right: 1.5px solid var(--border); }
+  .input-suffix { border-right: none; border-left: 1.5px solid var(--border); }
+  input[type="number"] { width: 100%; height: 42px; padding: 0 12px; border: none; background: transparent; font-family: 'DM Mono', monospace; font-size: 15px; outline: none; }
+
+  .cta-btn { margin-top: 2rem; padding: 13px 32px; background: var(--ink); color: var(--paper); border: none; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
+
+  /* RESULTS AREA */
+  .results { margin-top: 3rem; }
+  .verdict { border-radius: 6px; padding: 2.5rem; margin-bottom: 2rem; border: 2.5px solid var(--ink); background: #fff; box-shadow: 8px 8px 0px var(--border); }
+  .verdict-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; font-weight: 600; }
+  .verdict-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 4.5vw, 2.6rem); color: var(--ink); line-height: 1.1; margin-bottom: 12px; }
+  .verdict-sub { font-size: 15px; color: #000; font-weight: 400; line-height: 1.6; max-width: 700px; }
+
+  .metric-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  @media(max-width: 600px) { .metric-row { grid-template-columns: 1fr; } }
+  .metric-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 4px; padding: 16px; }
+  .mc-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+  .mc-value { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--ink); }
+  .mc-value.interest { color: var(--accent); }
+
+  .compare-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width: 600px) { .compare-panels { grid-template-columns: 1fr; } }
+  .panel { border-radius: 4px; border: 1.5px solid var(--border); padding: 1.5rem; background: #fff; }
+  .panel-label { font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; margin-bottom: 1rem; font-weight: 600; }
+  .panel-row { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding: 8px 0; }
+  .pr-val { font-family: 'DM Mono', monospace; font-weight: 500; }
+  .pr-val.highlight { font-family: 'DM Serif Display', serif; font-size: 1.4rem; }
+
+  .chart-container { background: #fff; border: 1.5px solid var(--border); border-radius: 4px; padding: 20px; margin-top: 1.5rem; height: 350px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Financial Comparison</div>
+  <h1>Rent vs <em>Buy</em></h1>
+  <p>An honest breakdown of your wealth after the loan tenure ends.</p>
+  <hr class="rule" />
+</header>
+
+<main>
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <span class="section-title">Loan Parameters</span>
+  </div>
+  <div class="form-grid">
+    <div>
+      <label class="form-label">Loan Amount</label>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="loan" value="7500000" /></div>
+    </div>
+    <div>
+      <label class="form-label">Interest Rate</label>
+      <div class="input-wrap"><input type="number" id="loan-rate" value="9" step="0.1" /><span class="input-suffix">%</span></div>
+    </div>
+    <div>
+      <label class="form-label">Tenure</label>
+      <div class="input-wrap"><input type="number" id="tenure" value="20" /><span class="input-suffix">yrs</span></div>
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <span class="section-title">Investment & Market</span>
+  </div>
+  <div class="form-grid-2">
+    <div>
+      <label class="form-label">SIP Return (Expected)</label>
+      <div class="input-wrap"><input type="number" id="sip-rate" value="12" step="0.1" /><span class="input-suffix">%</span></div>
+    </div>
+    <div>
+      <label class="form-label">Real Estate Growth</label>
+      <div class="input-wrap"><input type="number" id="prop-rate" value="6" step="0.1" /><span class="input-suffix">%</span></div>
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <span class="section-title">Renting & Cash</span>
+  </div>
+  <div class="form-grid">
+    <div>
+      <label class="form-label">Current Rent</label>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="rent" value="25000" /></div>
+    </div>
+    <div>
+      <label class="form-label">Rent Hike (Annual)</label>
+      <div class="input-wrap"><input type="number" id="rent-hike" value="5" step="0.1" /><span class="input-suffix">%</span></div>
+    </div>
+    <div>
+      <label class="form-label">Down Payment</label>
+      <div class="input-wrap"><span class="input-prefix">₹</span><input type="number" id="downpayment" value="2500000" /></div>
+    </div>
+  </div>
+
+  <button class="cta-btn" onclick="calculate()">Analyze My Wealth →</button>
+
+  <div id="results" class="results hidden">
+    <div class="verdict">
+      <div id="verdict-eyebrow" class="verdict-eyebrow">Analysis Results</div>
+      <div id="verdict-title" class="verdict-title">—</div>
+      <div id="verdict-sub" class="verdict-sub">—</div>
+    </div>
+
+    <div class="metric-row">
+      <div class="metric-card"><div class="mc-label">Monthly EMI</div><div class="mc-value" id="res-emi">—</div></div>
+      <div class="metric-card"><div class="mc-label">Total Interest Paid</div><div class="mc-value interest" id="res-interest">—</div></div>
+      <div class="metric-card"><div class="mc-label">Total Loan Cost</div><div class="mc-value" id="res-total-cost">—</div></div>
+    </div>
+
+    <div class="compare-panels">
+      <div class="panel">
+        <div class="panel-label" style="color: var(--buy);">🏠 Ownership Outcome</div>
+        <div class="panel-row"><span>Final House Value</span><span class="pr-val" id="res-buy-val">—</span></div>
+        <div class="panel-row"><span>Total Spent (EMI+Down)</span><span class="pr-val" id="res-buy-cost">—</span></div>
+        <div class="panel-row"><span>Net Wealth Gain</span><span class="pr-val highlight" id="res-buy-net">—</span></div>
+      </div>
+      <div class="panel">
+        <div class="panel-label" style="color: var(--rent);">📈 Rent + Invest Outcome</div>
+        <div class="panel-row"><span>Investment Portfolio</span><span class="pr-val" id="res-rent-val">—</span></div>
+        <div class="panel-row"><span>Total Rent Paid</span><span class="pr-val" id="res-rent-cost">—</span></div>
+        <div class="panel-row"><span>Net Wealth Gain</span><span class="pr-val highlight" id="res-rent-net">—</span></div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <canvas id="chart"></canvas>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+  let chart;
+  function f(n) { 
+    n = Math.round(n);
+    if (Math.abs(n) >= 1e7) return '₹' + (n/1e7).toFixed(2) + ' Cr';
+    if (Math.abs(n) >= 1e5) return '₹' + (n/1e5).toFixed(2) + ' L';
+    return '₹' + n.toLocaleString('en-IN');
+  }
+
+  function calculate() {
+    const loan = parseFloat(document.getElementById('loan').value);
+    const rate = parseFloat(document.getElementById('loan-rate').value) / 100 / 12;
+    const tenureYrs = parseInt(document.getElementById('tenure').value);
+    const n = tenureYrs * 12;
+    const sipR = parseFloat(document.getElementById('sip-rate').value) / 100 / 12;
+    const propR = parseFloat(document.getElementById('prop-rate').value) / 100;
+    const rent0 = parseFloat(document.getElementById('rent').value);
+    const rentH = parseFloat(document.getElementById('rent-hike').value) / 100;
+    const dp = parseFloat(document.getElementById('downpayment').value);
+
+    // 1. BUYING CALCULATIONS
+    const emi = loan * rate * Math.pow(1 + rate, n) / (Math.pow(1 + rate, n) - 1);
+    const totalLoanRepaid = emi * n;
+    const totalInterest = totalLoanRepaid - loan;
+    const finalPropVal = (loan + dp) * Math.pow(1 + propR, tenureYrs);
+    const buyTotalSpent = totalLoanRepaid + dp;
+    const buyNetWealth = finalPropVal - buyTotalSpent;
+
+    // 2. RENTING CALCULATIONS
+    let portfolio = dp;
+    let totalRentPaid = 0;
+    let currentRent = rent0;
+    let rentWealthHistory = [];
+    let buyWealthHistory = [];
+    let years = [];
+
+    for (let y = 0; y <= tenureYrs; y++) {
+      years.push('Yr ' + y);
+      const yearPropVal = (loan + dp) * Math.pow(1 + propR, y);
+      const yearLoanSpent = (emi * y * 12) + dp;
+      buyWealthHistory.push(Math.round(yearPropVal - yearLoanSpent));
+      rentWealthHistory.push(Math.round(portfolio - totalRentPaid));
+
+      if (y < tenureYrs) {
+        for (let m = 0; m < 12; m++) {
+          const diff = Math.max(0, emi - currentRent);
+          portfolio = (portfolio + diff) * (1 + sipR);
+          totalRentPaid += currentRent;
+        }
+        currentRent *= (1 + rentH);
+      }
+    }
+
+    const rentNetWealth = portfolio - totalRentPaid;
+
+    // UI UPDATES
+    document.getElementById('res-emi').textContent = f(emi);
+    document.getElementById('res-interest').textContent = f(totalInterest);
+    document.getElementById('res-total-cost').textContent = f(totalLoanRepaid);
+    
+    document.getElementById('res-buy-val').textContent = f(finalPropVal);
+    document.getElementById('res-buy-cost').textContent = f(buyTotalSpent);
+    document.getElementById('res-buy-net').textContent = f(buyNetWealth);
+
+    document.getElementById('res-rent-val').textContent = f(portfolio);
+    document.getElementById('res-rent-cost').textContent = f(totalRentPaid);
+    document.getElementById('res-rent-net').textContent = f(rentNetWealth);
+
+    const diff = Math.abs(buyNetWealth - rentNetWealth);
+    const buyWins = buyNetWealth > rentNetWealth;
+
+    document.getElementById('verdict-eyebrow').textContent = `After ${tenureYrs} Years:`;
+    document.getElementById('verdict-title').textContent = buyWins ? `Buying wins by ${f(diff)}` : `Renting wins by ${f(diff)}`;
+    document.getElementById('verdict-sub').textContent = buyWins 
+      ? `Even after paying ${f(totalInterest)} in interest, the growth of your property exceeds the potential returns from the stock market. Ownership is the stronger financial move here.`
+      : `By avoiding the ${f(totalInterest)} interest cost and investing your surplus cash, you end up significantly wealthier. Renting is the smarter play in this market.`;
+
+    // CHART
+    if (chart) chart.destroy();
+    chart = new Chart(document.getElementById('chart'), {
+      type: 'line',
+      data: {
+        labels: years,
+        datasets: [
+          { label: 'Buy Wealth', data: buyWealthHistory, borderColor: '#c84b2f', backgroundColor: 'rgba(200,75,47,0.1)', fill: true, tension: 0.3 },
+          { label: 'Rent Wealth', data: rentWealthHistory, borderColor: '#2f6fc8', backgroundColor: 'rgba(47,111,200,0.1)', fill: true, tension: 0.3 }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    document.getElementById('results').classList.remove('hidden');
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
