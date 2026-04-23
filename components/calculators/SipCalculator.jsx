@@ -92,9 +92,9 @@ export function SipCalculator() {
       {result ? (
         <div className="results-stack">
           <div className="metric-grid">
+            <MetricCard label="Maturity Value" value={formatCurrency(result.maturity)} highlight />
             <MetricCard label="Total Invested" value={formatCurrency(result.invested)} />
             <MetricCard label="Estimated Returns" value={formatCurrency(result.returns)} tone="green" />
-            <MetricCard label="Maturity Value" value={formatCurrency(result.maturity)} highlight />
           </div>
 
           <SimpleChart
