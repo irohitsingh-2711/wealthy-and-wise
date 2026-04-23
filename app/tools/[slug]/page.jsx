@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import {
   CalculatorShell,
   CoastFireCalculator,
+  FdCalculator,
   FireCalculator,
   GoalSipCalculator,
   RentVsBuyCalculator,
@@ -16,7 +17,8 @@ const componentMap = {
   "rent-vs-buy": RentVsBuyCalculator,
   "goal-sip": GoalSipCalculator,
   sip: SipCalculator,
-  "sip-duration": SipDurationCalculator
+  "sip-duration": SipDurationCalculator,
+  fd: FdCalculator
 };
 
 export function generateMetadata({ params }) {
