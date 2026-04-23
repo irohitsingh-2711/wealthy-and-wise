@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { PostResultPrompt } from "@/components/PostResultPrompt";
 import { SimpleChart } from "@/components/charts/SimpleChart";
@@ -184,6 +185,22 @@ export function CoastFireCalculator() {
               { label: "Coast Threshold", data: result.coastSeries, color: "#1a5c8a", dashed: true }
             ]}
           />
+
+          <div className="helper-links-card">
+            <span className="section-label">Plan The Next Step</span>
+            <p className="helper-links-copy">
+              Want to know how much SIP you should invest to achieve this target, or how much time
+              you would need to invest to get there?
+            </p>
+            <div className="helper-links-row">
+              <Link href="/tools/goal-sip" className="helper-link">
+                Open Goal SIP Calculator
+              </Link>
+              <Link href="/tools/sip-duration" className="helper-link">
+                Open SIP Duration Calculator
+              </Link>
+            </div>
+          </div>
 
           <PostResultPrompt
             currentSlug="coast-fire"

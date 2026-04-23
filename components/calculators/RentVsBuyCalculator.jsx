@@ -32,6 +32,7 @@ export function RentVsBuyCalculator() {
       (Math.pow(1 + monthlyLoanRate, months) - 1);
     const totalLoanRepaid = emi * months;
     const totalInterest = totalLoanRepaid - values.loan;
+    const monthlyInvestableAmount = Math.max(0, emi - values.rent);
     const finalPropertyValue =
       (values.loan + values.downpayment) * Math.pow(1 + propertyGrowth, values.tenure);
     const buyTotalSpent = totalLoanRepaid + values.downpayment;
@@ -68,6 +69,7 @@ export function RentVsBuyCalculator() {
 
     setResult({
       emi,
+      monthlyInvestableAmount,
       totalInterest,
       totalLoanRepaid,
       finalPropertyValue,
@@ -87,19 +89,55 @@ export function RentVsBuyCalculator() {
   return (
     <div className="calculator-panel">
       <div className="form-card">
-        <div className="field-grid three">
-          <Field label="Loan Amount" value={values.loan} onChange={(value) => update("loan", value)} prefix="Rs" />
-          <Field label="Interest Rate" value={values.loanRate} onChange={(value) => update("loanRate", value)} suffix="%" step="0.1" />
-          <Field label="Tenure" value={values.tenure} onChange={(value) => update("tenure", value)} suffix="yrs" />
-          <Field label="SIP Return" value={values.sipRate} onChange={(value) => update("sipRate", value)} suffix="%" step="0.1" />
-          <Field label="Real Estate Growth" value={values.propertyRate} onChange={(value) => update("propertyRate", value)} suffix="%" step="0.1" />
-          <Field label="Current Rent" value={values.rent} onChange={(value) => update("rent", value)} prefix="Rs" />
-          <Field label="Rent Hike" value={values.rentHike} onChange={(value) => update("rentHike", value)} suffix="%" step="0.1" />
-          <Field label="Down Payment" value={values.downpayment} onChange={(value) => update("downpayment", value)} prefix="Rs" />
+        <section className="form-section">
+          <div className="form-section-header">
+            <span className="section-label">Section 01</span>
+            <h3 className="form-section-title">If you buy the house today</h3>
+            <p className="form-section-copy">
+              Tell us the home loan details and how you expect the property itself to appreciate.
+            </p>
+          </div>
+          <div className="field-grid three">
+            <Field label="Down Payment" value={values.downpayment} onChange={(value) => update("downpayment", value)} prefix="Rs" />
+            <Field label="Loan Amount" value={values.loan} onChange={(value) => update("loan", value)} prefix="Rs" />
+            <Field label="Loan Tenure" value={values.tenure} onChange={(value) => update("tenure", value)} suffix="yrs" />
+            <Field label="Interest Rate" value={values.loanRate} onChange={(value) => update("loanRate", value)} suffix="%" step="0.1" />
+            <Field label="Real Estate Growth Rate" value={values.propertyRate} onChange={(value) => update("propertyRate", value)} suffix="%" step="0.1" />
+          </div>
+        </section>
+
+        <section className="form-section">
+          <div className="form-section-header">
+            <span className="section-label">Section 02</span>
+            <h3 className="form-section-title">If you choose to rent instead</h3>
+            <p className="form-section-copy">
+              Enter the rent you would pay today and how much you expect that rent to rise over time.
+            </p>
+          </div>
+          <div className="field-grid two">
+            <Field label="Monthly Rent Today" value={values.rent} onChange={(value) => update("rent", value)} prefix="Rs" />
+            <Field label="Rent Inflation" value={values.rentHike} onChange={(value) => update("rentHike", value)} suffix="%" step="0.1" />
+          </div>
+        </section>
+
+        <section className="form-section">
+          <div className="form-section-header">
+            <span className="section-label">Section 03</span>
+            <h3 className="form-section-title">If you invest the money instead</h3>
+            <p className="form-section-copy">
+              Estimate how fast your investment portfolio could grow if that money were invested today.
+            </p>
+          </div>
+          <div className="field-grid two">
+            <Field label="Expected Investment Growth" value={values.sipRate} onChange={(value) => update("sipRate", value)} suffix="%" step="0.1" />
+          </div>
+        </section>
+
+        <div className="form-actions">
+          <button className="cta-btn" onClick={calculate}>
+            Analyze My Wealth
+          </button>
         </div>
-        <button className="cta-btn" onClick={calculate}>
-          Analyze My Wealth
-        </button>
       </div>
 
       {result ? (
@@ -118,6 +156,7 @@ export function RentVsBuyCalculator() {
 
           <div className="metric-grid">
             <MetricCard label="Monthly EMI" value={formatCurrency(result.emi)} />
+            <MetricCard label="Investable Amount = Monthly EMI - Rent" value={formatCurrency(result.monthlyInvestableAmount)} />
             <MetricCard label="Total Interest Paid" value={formatCurrency(result.totalInterest)} />
             <MetricCard label="Total Loan Cost" value={formatCurrency(result.totalLoanRepaid)} highlight />
           </div>
@@ -134,6 +173,7 @@ export function RentVsBuyCalculator() {
               <strong>{formatCurrency(result.rentNetWealth)}</strong>
               <p>Portfolio value: {formatCurrency(result.portfolio)}</p>
               <p>Total rent paid: {formatCurrency(result.totalRentPaid)}</p>
+              <p>Monthly amount available to invest today: {formatCurrency(result.monthlyInvestableAmount)}</p>
             </article>
           </div>
 

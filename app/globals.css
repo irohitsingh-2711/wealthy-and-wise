@@ -12,6 +12,7 @@
   --accent-fire: #e05a1a;
   --accent-coast: #1a5c8a;
   --shadow: 0 18px 60px rgba(16, 16, 16, 0.08);
+  --font-results: "Gotham Bold", "Gotham", "Montserrat", var(--font-sans), sans-serif;
 }
 
 :root[data-theme="dark"] {
@@ -93,7 +94,7 @@ textarea {
 .brand {
   font-family: var(--font-serif), serif;
   font-size: 1.55rem;
-  letter-spacing: -0.03em;
+  letter-spacing: 0.02em;
 }
 
 .brand em,
@@ -175,11 +176,11 @@ textarea {
 .hero h1,
 .calculator-hero h1 {
   margin: 0;
-  max-width: 12ch;
+  max-width: 16ch;
   font-family: var(--font-serif), serif;
-  font-size: clamp(2.9rem, 7vw, 5.5rem);
-  letter-spacing: -0.05em;
-  line-height: 0.98;
+  font-size: clamp(1.95rem, 4.4vw, 3.7rem);
+  letter-spacing: 0.03em;
+  line-height: 1.08;
 }
 
 .hero-copy,
@@ -189,6 +190,7 @@ textarea {
   color: var(--muted);
   line-height: 1.8;
   font-size: 1rem;
+  letter-spacing: 0.03em;
 }
 
 .home-section {
@@ -255,7 +257,7 @@ textarea {
   margin: 0;
   font-family: var(--font-serif), serif;
   font-size: 1.8rem;
-  letter-spacing: -0.03em;
+  letter-spacing: 0.03em;
 }
 
 :root[data-theme="dark"] .tool-card h2,
@@ -334,6 +336,7 @@ textarea {
 .steps-grid h3 {
   margin: 0.8rem 0 0.4rem;
   font-size: 1rem;
+  letter-spacing: 0.03em;
 }
 
 .steps-grid p {
@@ -465,7 +468,7 @@ textarea {
 .insight-card h3 {
   display: block;
   font-family: var(--font-serif), serif;
-  letter-spacing: -0.03em;
+  letter-spacing: 0.03em;
 }
 
 .toggle-header strong {
@@ -503,6 +506,8 @@ textarea {
 .metric-card strong {
   margin-top: 0.45rem;
   font-size: 1.75rem;
+  font-family: var(--font-results);
+  font-weight: 700;
 }
 
 .metric-card-highlight {
@@ -520,6 +525,14 @@ textarea {
 
 :root[data-theme="dark"] .metric-card-green strong {
   color: #8fe0ad;
+}
+
+.metric-card-red strong {
+  color: #cf4838;
+}
+
+:root[data-theme="dark"] .metric-card-red strong {
+  color: #ff8f83;
 }
 
 .progress-row {
@@ -662,6 +675,47 @@ textarea {
   margin-top: 1rem;
 }
 
+.helper-links-card {
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow);
+  padding: 1rem 1.1rem;
+}
+
+:root[data-theme="dark"] .helper-links-card {
+  background: rgba(24, 32, 43, 0.82);
+}
+
+.helper-links-copy {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+  letter-spacing: 0.02em;
+}
+
+.helper-links-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.9rem;
+}
+
+.helper-link {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.55rem 0.8rem;
+  background: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:root[data-theme="dark"] .helper-link {
+  background: rgba(255, 255, 255, 0.05);
+}
+
 .compare-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -675,6 +729,36 @@ textarea {
 .compare-card strong {
   margin-top: 0.5rem;
   font-size: 1.8rem;
+  font-family: var(--font-results);
+  font-weight: 700;
+}
+
+.form-section + .form-section {
+  margin-top: 1.6rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--border);
+}
+
+.form-section-header {
+  margin-bottom: 1rem;
+}
+
+.form-section-title {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-serif), serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.03em;
+}
+
+.form-section-copy {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+  letter-spacing: 0.02em;
+}
+
+.form-actions {
+  margin-top: 1.3rem;
 }
 
 .compare-card p,
@@ -842,6 +926,19 @@ textarea {
   .metric-card strong,
   .compare-card strong {
     font-size: 1.45rem;
+  }
+
+  .form-section + .form-section {
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+  }
+
+  .form-section-title {
+    font-size: 1.08rem;
+  }
+
+  .form-section-copy {
+    font-size: 0.88rem;
   }
 
   .prompt-box {

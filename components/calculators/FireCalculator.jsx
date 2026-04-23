@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { PostResultPrompt } from "@/components/PostResultPrompt";
 import { SimpleChart } from "@/components/charts/SimpleChart";
@@ -117,6 +118,7 @@ export function FireCalculator() {
             <MetricCard
               label="Gap / Surplus"
               value={`${result.gap >= 0 ? "+" : "-"}${formatCurrency(Math.abs(result.gap))}`}
+              tone={result.gap >= 0 ? "green" : "red"}
             />
             <MetricCard label="Inflation-Adjusted Annual Spend" value={formatCurrency(result.annualExpenses)} />
           </div>
@@ -139,6 +141,22 @@ export function FireCalculator() {
               { label: "FIRE Number", data: result.targetSeries, color: "#e05a1a", dashed: true }
             ]}
           />
+
+          <div className="helper-links-card">
+            <span className="section-label">Plan The Next Step</span>
+            <p className="helper-links-copy">
+              Want to know how much SIP you should invest to achieve this target, or how much time
+              you would need to invest to get there?
+            </p>
+            <div className="helper-links-row">
+              <Link href="/tools/goal-sip" className="helper-link">
+                Open Goal SIP Calculator
+              </Link>
+              <Link href="/tools/sip-duration" className="helper-link">
+                Open SIP Duration Calculator
+              </Link>
+            </div>
+          </div>
 
           <PostResultPrompt
             currentSlug="fire"
@@ -200,7 +218,7 @@ function ToggleBlock({ checked, onChange, title, caption, children }) {
 
 function MetricCard({ label, value, highlight, tone }) {
   return (
-    <article className={`metric-card ${highlight ? "metric-card-highlight" : ""} ${tone === "green" ? "metric-card-green" : ""}`}>
+    <article className={`metric-card ${highlight ? "metric-card-highlight" : ""} ${tone === "green" ? "metric-card-green" : ""} ${tone === "red" ? "metric-card-red" : ""}`}>
       <span>{label}</span>
       <strong>{value}</strong>
     </article>
